@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE JAE RICH PROJECT — Live Song Requests</title>
+  <meta name="description" content="The Jae Rich Project — A vocalist/guitarist duo covering rock, soul, pop, funk, motown, top 40 and beyond. Request a song live!">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════
+       THE JAE RICH PROJECT — Neo-Soul Pop Rock Vibe
+       ═══════════════════════════════════════════════════ */
+
+    :root {
+      --bg-deep: #0a0a0f;
+      --bg-card: rgba(20, 18, 30, 0.7);
+      --bg-card-solid: #14121e;
+      --gold: #d4a574;
+      --gold-light: #e6c9a0;
+      --gold-glow: rgba(212, 165, 116, 0.3);
+      --amber: #c9735b;
+      --purple: #7c5cbf;
+      --purple-soft: rgba(124, 92, 191, 0.15);
+      --cream: #f5f0e8;
+      --cream-soft: rgba(245, 240, 232, 0.7);
+      --text-muted: rgba(245, 240, 232, 0.5);
+      --border: rgba(212, 165, 116, 0.12);
+      --success: #5cb87a;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-deep);
+      color: var(--cream);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ─── Typography ─── */
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    /* ─── Ambient Background ─── */
+    .ambient {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      animation: float 20s ease-in-out infinite;
+    }
+    .ambient-orb:nth-child(1) {
+      width: 600px; height: 600px;
+      background: var(--purple);
+      top: -200px; left: -200px;
+      animation-delay: 0s;
+    }
+    .ambient-orb:nth-child(2) {
+      width: 500px; height: 500px;
+      background: var(--gold);
+      bottom: -150px; right: -150px;
+      animation-delay: -7s;
+    }
+    .ambient-orb:nth-child(3) {
+      width: 400px; height: 400px;
+      background: var(--amber);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -14s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ─── Header / Hero ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+    }
+
+    .hero-logo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bg-card-solid), #1e1a2e);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+      box-shadow: 0 0 60px var(--gold-glow);
+    }
+
+    .hero-logo::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--gold), var(--purple), var(--amber), var(--gold));
+      z-index: -1;
+      opacity: 0.4;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-logo svg {
+      width: 70px;
+      height: 70px;
+      fill: var(--gold);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--amber));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--cream-soft);
+      font-weight: 300;
+      max-width: 500px;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-genres {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .genre-tag {
+      padding: 0.35rem 1rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      color: var(--cream-soft);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      color: var(--bg-deep);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px var(--gold-glow);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s ease-in-out infinite;
+    }
+    .scroll-indicator svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text-muted);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ─── Sections ─── */
+    .section {
+      padding: 5rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      color: var(--cream);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--amber));
+      margin: 1rem auto 0;
+      border-radius: 1px;
+    }
+
+    /* ─── About ─── */
+    .about-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      text-align: center;
+    }
+
+    .about-card p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--cream-soft);
+    }
+
+    .about-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Tab Navigation ─── */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      background: transparent;
+      color: var(--cream-soft);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      color: var(--bg-deep);
+      border-color: transparent;
+    }
+
+    /* ─── Search ─── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.25rem 1rem 3.25rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--gold); }
+
+    /* ─── Song List ─── */
+    .song-count {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .song-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .song-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold), var(--amber));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .song-item:hover {
+      border-color: var(--gold);
+      transform: translateX(4px);
+    }
+
+    .song-item:hover::before { opacity: 1; }
+
+    .song-item.requested {
+      opacity: 0.4;
+      pointer-events: none;
+      border-color: transparent;
+    }
+
+    .song-item.requested::after {
+      content: 'REQUESTED';
+      position: absolute;
+      right: 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--success);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .song-item.playing {
+      border-color: var(--gold);
+      background: linear-gradient(90deg, rgba(212,165,116,0.1), transparent);
+    }
+
+    .song-item.playing::after {
+      content: '♪ NOW PLAYING';
+      position: absolute;
+      right: 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .song-item.played {
+      opacity: 0.25;
+      pointer-events: none;
+      border-color: transparent;
+    }
+
+    .song-item.played::after {
+      content: 'PLAYED';
+      position: absolute;
+      right: 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .song-info { flex: 1; min-width: 0; }
+
+    .song-artist {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--cream);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-genre-badge {
+      font-size: 0.6rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      background: var(--purple-soft);
+      color: var(--cream-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-left: 0.75rem;
+    }
+
+    /* ─── Request Modal ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal h3 {
+      font-size: 1.4rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal .modal-song-info {
+      color: var(--cream-soft);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 0.9rem 1.25rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: 1.25rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .modal-input::placeholder { color: var(--text-muted); }
+    .modal-input:focus { border-color: var(--gold); }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 0.85rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--cream-soft);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover { border-color: var(--cream-soft); }
+
+    .btn-request {
+      flex: 2;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--bg-deep);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-request:hover { transform: translateY(-1px); box-shadow: 0 5px 20px var(--gold-glow); }
+
+    /* ─── Live Queue ─── */
+    .queue-section {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .queue-header h3 {
+      font-size: 1.3rem;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .queue-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .queue-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+    }
+
+    .queue-empty {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .queue-item:first-child {
+      border-color: var(--gold);
+      background: rgba(212,165,116,0.06);
+    }
+
+    .queue-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      font-weight: 700;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .queue-item:first-child .queue-number::after {
+      content: ' ♪';
+      font-size: 0.8rem;
+    }
+
+    .queue-song-info { flex: 1; min-width: 0; }
+
+    .queue-song-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cream);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-song-artist {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .queue-requester {
+      font-size: 0.75rem;
+      color: var(--gold);
+      font-style: italic;
+      flex-shrink: 0;
+    }
+
+    /* ─── QR Code Section ─── */
+    .qr-section {
+      text-align: center;
+      padding: 4rem 1.5rem;
+    }
+
+    .qr-card {
+      display: inline-block;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+    }
+
+    .qr-card h3 {
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+
+    .qr-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    #qr-canvas {
+      background: white;
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      display: inline-block;
+    }
+
+    .qr-url {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    /* ─── Admin Bar ─── */
+    .admin-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-card-solid);
+      border-top: 1px solid var(--gold);
+      padding: 0.75rem 1.5rem;
+      z-index: 100;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .admin-bar.active { display: flex; }
+
+    .admin-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--cream-soft);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .admin-btn:hover { background: var(--gold); color: var(--bg-deep); }
+    .admin-btn.danger { border-color: var(--amber); color: var(--amber); }
+    .admin-btn.danger:hover { background: var(--amber); color: var(--bg-deep); }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-link {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      border-color: var(--gold);
+      background: var(--gold-glow);
+    }
+
+    .social-link svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--cream-soft);
+    }
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Toast Notification ─── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-card-solid);
+      border: 1px solid var(--success);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.5rem;
+      color: var(--cream);
+      font-size: 0.9rem;
+      z-index: 2000;
+      transition: transform 0.4s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .hero { min-height: 90vh; padding-top: 4rem; }
+      .section { padding: 3rem 1rem; }
+      .about-stats { gap: 1.5rem; }
+      .modal { padding: 2rem 1.5rem; }
+      .queue-item { padding: 0.75rem; }
+      .song-item { padding: 0.85rem 1rem; }
+      .admin-bar { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
+    }
+
+    /* ─── Fade-in animation for songs ─── */
+    .song-item {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="ambient">
+    <div class="ambient-orb"></div>
+    <div class="ambient-orb"></div>
+    <div class="ambient-orb"></div>
+  </div>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="top">
+    <div class="hero-logo">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4c-5.5 0-10 4.5-10 10v16c0 5.5 4.5 10 10 10s10-4.5 10-10V14c0-5.5-4.5-10-10-10z"/>
+        <path d="M48 28v2c0 8.8-7.2 16-16 16s-16-7.2-16-16v-2h-4v2c0 10.3 7.8 18.8 18 19.9V56h-8v4h20v-4h-8v-6.1c10.2-1.1 18-9.6 18-19.9v-2h-4z"/>
+      </svg>
+    </div>
+    <h1>THE JAE RICH PROJECT</h1>
+    <p class="hero-tagline">A vocalist &amp; guitarist duo delivering unforgettable live covers — from soul to rock and everything in between.</p>
+    <div class="hero-genres">
+      <span class="genre-tag">Rock</span>
+      <span class="genre-tag">Soul</span>
+      <span class="genre-tag">Pop</span>
+      <span class="genre-tag">Funk</span>
+      <span class="genre-tag">Motown</span>
+      <span class="genre-tag">Top 40</span>
+    </div>
+    <a href="#songs" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Request a Song
+    </a>
+    <div class="scroll-indicator">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT ═══ -->
+  <section class="section" id="about">
+    <div class="section-header">
+      <h2>About Us</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="about-card">
+      <p>The Jae Rich Project is a vocalist/guitarist duo covering a wide variety of music genres ranging from rock, soul, pop to funk, party, motown, top 40 and the list goes on — ensuring a great time for all! Based in the Emerald Coast of Florida, we bring the vibes wherever we go.</p>
+      <div class="about-stats">
+        <div class="stat">
+          <div class="stat-value">775+</div>
+          <div class="stat-label">Followers</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">100%</div>
+          <div class="stat-label">Recommended</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">★★★★★</div>
+          <div class="stat-label">5 Reviews</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SONG LIST ═══ -->
+  <section class="section" id="songs">
+    <div class="section-header">
+      <h2>Song List</h2>
+      <p>Tap any song to request it. The playlist builds live as requests come in!</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="tabs" id="genre-tabs">
+      <button class="tab-btn active" data-genre="all">All</button>
+      <button class="tab-btn" data-genre="Rock">Rock</button>
+      <button class="tab-btn" data-genre="Soul/R&B">Soul/R&B</button>
+      <button class="tab-btn" data-genre="Pop">Pop</button>
+      <button class="tab-btn" data-genre="Funk">Funk</button>
+      <button class="tab-btn" data-genre="Country">Country</button>
+      <button class="tab-btn" data-genre="Modern">Modern</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="search" placeholder="Search by artist or song...">
+    </div>
+
+    <div class="song-count" id="song-count"></div>
+
+    <!-- Song List -->
+    <div class="song-list" id="song-list"></div>
+
+    <!-- Live Queue -->
+    <div class="queue-section" id="queue-section">
+      <div class="queue-header">
+        <h3><span class="queue-live-dot"></span> Live Queue</h3>
+        <span class="queue-count" id="queue-count">0 songs</span>
+      </div>
+      <div id="queue-list">
+        <div class="queue-empty">No requests yet — be the first! 🎵</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ QR CODE ═══ -->
+  <section class="qr-section" id="qr">
+    <div class="section-header">
+      <h2>Scan to Request</h2>
+      <p>Point your camera at this QR code to jump straight to the song list</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="qr-card">
+      <h3>📱 Scan Me</h3>
+      <p>Open your camera app and point it here</p>
+      <div id="qr-canvas"></div>
+      <div class="qr-url" id="qr-url"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="social-links">
+      <a href="https://www.facebook.com/people/THE-JAE-RICH-PROJECT/100077885284749/" target="_blank" class="social-link" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/TheJaeRichProject" target="_blank" class="social-link" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+    </div>
+    <p class="footer-text">© 2026 The Jae Rich Project — Emerald Coast, FL</p>
+    <p class="footer-text" style="margin-top:0.5rem; font-size:0.7rem;">
+      <span id="admin-toggle" style="cursor:pointer; user-select:none;">🎛️</span>
+    </p>
+  </footer>
+
+  <!-- ═══ REQUEST MODAL ═══ -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>Request This Song</h3>
+      <div class="modal-song-info" id="modal-song-info"></div>
+      <input type="text" class="modal-input" id="requester-name" placeholder="Your name (optional)" maxlength="30" autocomplete="off">
+      <div class="modal-actions">
+        <button class="btn-cancel" id="modal-cancel">Cancel</button>
+        <button class="btn-request" id="modal-confirm">🎵 Request It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══ ADMIN BAR ═══ -->
+  <div class="admin-bar" id="admin-bar">
+    <button class="admin-btn" onclick="adminMarkPlayed()">✓ Mark Next as Played</button>
+    <button class="admin-btn" onclick="adminSkip()">⏭ Skip Next</button>
+    <button class="admin-btn danger" onclick="adminClear()">🗑 Clear Queue</button>
+    <button class="admin-btn danger" onclick="adminReset()">↻ Reset All Songs</button>
+  </div>
+
+  <!-- QR Code via CDN library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    // THE JAE RICH PROJECT — Song Request System
+    // ═══════════════════════════════════════════════════
+
+    // ─── SONG DATABASE ───
+    // Format: [Artist, Song Title, Genre]
+    // Sorted alphabetically by Artist → Title
+    const SONGS = [
+      // ─── A ───
+      ["A-ha", "Take On Me", "Rock"],
+      ["ABBA", "Dancing Queen", "Funk"],
+      ["Adele", "Make You Feel My Love", "Pop"],
+      ["Aerosmith", "Dream On", "Rock"],
+      ["Al Green", "Let's Stay Together", "Soul/R&B"],
+      ["Alanis Morissette", "Ironic", "Rock"],
+      ["Alanis Morissette", "One Hand In My Pocket", "Rock"],
+      ["Alex Clare", "Too Close", "Modern"],
+      ["Alicia Keys", "Fallin'", "Soul/R&B"],
+      ["Alicia Keys", "If I Ain't Got You", "Soul/R&B"],
+      ["All-4-One", "I Swear", "Soul/R&B"],
+      ["Amy Winehouse", "Love Is A Losing Game", "Soul/R&B"],
+      ["Amy Winehouse", "Valerie", "Soul/R&B"],
+      ["Animals", "House Of The Rising Sun", "Rock"],
+      ["Anita Baker", "Caught Up In The Rapture", "Soul/R&B"],
+      ["Anthony Hamilton", "Charlene", "Soul/R&B"],
+      // ─── B ───
+      ["Backstreet Boys", "As Long As You Love Me", "Pop"],
+      ["Backstreet Boys", "I Want It That Way", "Pop"],
+      ["Bee Gees", "Stayin' Alive", "Funk"],
+      ["Ben E. King", "Stand By Me", "Soul/R&B"],
+      ["Ben Harper", "Steal My Kisses", "Modern"],
+      ["Beres Hammond", "I Feel Good", "Soul/R&B"],
+      ["Beyoncé", "Love On Top", "Soul/R&B"],
+      ["Bill Withers", "Ain't No Sunshine", "Soul/R&B"],
+      ["Bill Withers", "Just The Two Of Us", "Soul/R&B"],
+      ["Bill Withers", "Lean On Me", "Soul/R&B"],
+      ["Bill Withers", "Lovely Day", "Soul/R&B"],
+      ["Billie Eilish", "Birds Of A Feather", "Modern"],
+      ["Billy Joel", "Just The Way You Are", "Rock"],
+      ["Billy Joel", "Piano Man", "Rock"],
+      ["Black Pumas", "Colors", "Soul/R&B"],
+      ["Blackstreet", "No Diggity", "Soul/R&B"],
+      ["Bob Marley", "Is This Love", "Funk"],
+      ["Bob Marley", "Three Little Birds", "Funk"],
+      ["Bobby Brown", "Roni", "Soul/R&B"],
+      ["Bobby Caldwell", "What You Won't Do", "Soul/R&B"],
+      ["Bobby McFerrin", "Don't Worry Be Happy", "Pop"],
+      ["Bon Jovi", "I'll Be There For You", "Rock"],
+      ["Bon Jovi", "Livin' On A Prayer", "Rock"],
+      ["Bonnie Raitt", "I Can't Make You Love Me", "Soul/R&B"],
+      ["Boston", "More Than A Feeling", "Rock"],
+      ["Bread", "If", "Pop"],
+      ["Britney Spears", "...Baby One More Time", "Pop"],
+      ["Brooks & Dunn", "Neon Moon", "Country"],
+      ["Bruno Mars", "Just The Way You Are", "Pop"],
+      ["Bruno Mars", "Lazy Song", "Pop"],
+      ["Bruno Mars", "Uptown Funk", "Funk"],
+      ["Bryan Adams", "Summer Of '69", "Rock"],
+      // ─── C ───
+      ["Cameo", "Word Up", "Funk"],
+      ["CCR", "Have You Ever Seen The Rain", "Rock"],
+      ["CCR", "Proud Mary", "Rock"],
+      ["CeeLo Green", "Forget You", "Funk"],
+      ["Chaka Khan", "Ain't Nobody", "Soul/R&B"],
+      ["Chaka Khan", "Sweet Thing", "Soul/R&B"],
+      ["Chaka Khan", "Through The Fire", "Soul/R&B"],
+      ["Cher", "Believe", "Pop"],
+      ["Cheryl Lynn", "Got To Be Real", "Funk"],
+      ["Childish Gambino", "Redbone", "Soul/R&B"],
+      ["Chris Brown", "With You", "Soul/R&B"],
+      ["Chris Isaak", "Wicked Games", "Rock"],
+      ["Chris Stapleton", "Starting Over", "Country"],
+      ["Chris Stapleton", "Tennessee Whiskey", "Country"],
+      ["Christopher Cross", "Sailing", "Pop"],
+      ["Clean Bandit", "Rather Be", "Modern"],
+      ["Colbie Caillat", "Lucky", "Pop"],
+      ["Coldplay", "Clocks", "Rock"],
+      ["Coldplay", "Fix You", "Rock"],
+      ["Coldplay", "Viva La Vida", "Rock"],
+      ["Coldplay", "Yellow", "Rock"],
+      ["Commodores", "Brick House", "Funk"],
+      ["Corinne Bailey Rae", "Put Your Records On", "Soul/R&B"],
+      // ─── D ───
+      ["Daft Punk", "Get Lucky", "Funk"],
+      ["Darius Rucker", "Wagon Wheel", "Country"],
+      ["Des'ree", "You Gotta Be", "Soul/R&B"],
+      ["Dido", "Thank You", "Pop"],
+      ["Donny Hathaway", "Jealous Guy", "Soul/R&B"],
+      ["Doobie Brothers", "Long Train Runnin'", "Rock"],
+      ["Drake", "Hold On We're Going Home", "Soul/R&B"],
+      ["Drifters", "Under The Boardwalk", "Soul/R&B"],
+      // ─── E ───
+      ["Eagles", "Hotel California", "Rock"],
+      ["Earth, Wind & Fire", "September", "Funk"],
+      ["Ed Sheeran", "Azizam", "Modern"],
+      ["Ed Sheeran", "Photograph", "Pop"],
+      ["Ed Sheeran", "Thinkin Out Loud", "Pop"],
+      ["Edwin McCain", "I'll Be", "Rock"],
+      ["Elvis Presley", "Can't Help Falling In Love", "Pop"],
+      ["Eric Clapton", "Change The World", "Rock"],
+      ["Eric Clapton", "Wonderful Tonight", "Rock"],
+      ["Etta James", "At Last", "Soul/R&B"],
+      ["Eurythmics", "Sweet Dreams", "Rock"],
+      // ─── F ───
+      ["Fallout Boy", "Sugar We're Going Down", "Rock"],
+      ["Fleetwood Mac", "Dreams", "Rock"],
+      ["Fleetwood Mac", "Landslide", "Rock"],
+      ["Fleetwood Mac", "The Chain", "Rock"],
+      ["4 Non Blondes", "What's Up", "Rock"],
+      ["Frank Ocean", "Thinkin Bout You", "Soul/R&B"],
+      ["Frank Sinatra", "Fly Me To The Moon", "Soul/R&B"],
+      ["Frankie Valli", "Can't Take My Eyes Off Of You", "Pop"],
+      ["Fugees", "Killing Me Softly", "Soul/R&B"],
+      // ─── G ───
+      ["George Benson", "Give Me The Night", "Soul/R&B"],
+      ["Glass Animals", "Heat Waves", "Modern"],
+      ["Gnarls Barkley", "Crazy", "Soul/R&B"],
+      ["Goo Goo Dolls", "Iris", "Rock"],
+      ["Gotye", "Somebody That I Used To Know", "Modern"],
+      ["Green Day", "Boulevard Of Broken Dreams", "Rock"],
+      ["Green Day", "Good Riddance", "Rock"],
+      ["Guns N' Roses", "Sweet Child O' Mine", "Rock"],
+      // ─── H ───
+      ["H.E.R.", "Best Part", "Soul/R&B"],
+      ["Hall & Oates", "Sara Smile", "Soul/R&B"],
+      ["Hank Williams", "Hey Good Lookin'", "Country"],
+      ["Harry Belafonte", "Jump In The Line", "Funk"],
+      ["Harry Styles", "As It Was", "Pop"],
+      ["Harry Styles", "Watermelon Sugar", "Pop"],
+      ["Heart", "Alone", "Rock"],
+      ["Hoobastank", "The Reason", "Rock"],
+      ["Hozier", "Too Sweet", "Modern"],
+      // ─── I ───
+      ["Imagine Dragons", "On Top Of The World", "Rock"],
+      ["Incubus", "Drive", "Rock"],
+      ["Israel Kamakawiwoʻole", "Somewhere Over The Rainbow", "Country"],
+      // ─── J ───
+      ["Jackson 5", "I Want You Back", "Soul/R&B"],
+      ["James Bay", "Hold Back The River", "Modern"],
+      ["James Brown", "It's A Man's World", "Soul/R&B"],
+      ["James Taylor", "How Sweet It Is", "Soul/R&B"],
+      ["Jason Mraz", "I'm Yours", "Modern"],
+      ["Jazmine Sullivan", "Need U Bad", "Soul/R&B"],
+      ["Jeff Buckley", "Hallelujah", "Rock"],
+      ["Jesse McCartney", "Beautiful Soul", "Pop"],
+      ["Jet", "Are You Gonna Be My Girl", "Rock"],
+      ["Jimmy Buffett", "Margaritaville", "Country"],
+      ["Joe Cocker", "You Are So Beautiful", "Soul/R&B"],
+      ["John Denver", "Take Me Home Country Roads", "Country"],
+      ["John Legend", "Ordinary People", "Soul/R&B"],
+      ["John Legend", "Save Room", "Soul/R&B"],
+      ["John Mayer", "Gravity", "Modern"],
+      ["Johnny Cash", "You Are My Sunshine", "Country"],
+      ["Johnny Nash", "I Can See Clearly Now", "Soul/R&B"],
+      ["Jon Batiste", "It's Alright", "Soul/R&B"],
+      ["Josh Turner", "Your Man", "Country"],
+      ["Journey", "Don't Stop Believin'", "Rock"],
+      ["Journey", "Lights", "Rock"],
+      ["Journey", "Open Arms", "Rock"],
+      ["Journey", "Separate Ways", "Rock"],
+      ["Justin Bieber", "Baby", "Pop"],
+      ["Justin Bieber", "Let Me Love You", "Pop"],
+      ["Justin Timberlake", "Can't Stop The Feeling", "Pop"],
+      ["Justin Timberlake", "Cry Me A River", "Pop"],
+      // ─── K ───
+      ["K-Ci & JoJo", "All My Life", "Soul/R&B"],
+      ["Kansas", "Dust In The Wind", "Rock"],
+      ["KC & The Sunshine Band", "Boogie Shoes", "Funk"],
+      ["Kenny Loggins", "Footloose", "Rock"],
+      ["Kenny Rogers", "Islands In The Stream", "Country"],
+      ["Kings Of Leon", "Use Somebody", "Rock"],
+      ["Kool & The Gang", "Get Down On It", "Funk"],
+      // ─── L ───
+      ["Lady Antebellum", "Need You Now", "Country"],
+      ["Lady Gaga", "Always Remember Us This Way", "Pop"],
+      ["Larry Graham", "One In A Million", "Soul/R&B"],
+      ["Lauryn Hill", "Ex-Factor", "Soul/R&B"],
+      ["Lenny Kravitz", "Fly Away", "Rock"],
+      ["Lenny Kravitz", "It Ain't Over Til It's Over", "Rock"],
+      ["Lionel Richie", "All Night Long", "Funk"],
+      ["Lionel Richie", "Endless Love", "Soul/R&B"],
+      ["Lionel Richie", "Stuck On You", "Soul/R&B"],
+      ["Lonestar", "Amazed", "Country"],
+      ["Louis Armstrong", "What A Wonderful World", "Soul/R&B"],
+      ["Lumineers", "Ho Hey", "Modern"],
+      ["Luther Vandross", "Never Too Much", "Soul/R&B"],
+      ["Lynyrd Skynyrd", "Simple Man", "Rock"],
+      // ─── M ───
+      ["Magic!", "Rude", "Modern"],
+      ["Mariah Carey", "Always Be My Baby", "Soul/R&B"],
+      ["Mario", "Let Me Love You", "Soul/R&B"],
+      ["Maroon 5", "Memories", "Pop"],
+      ["Maroon 5", "She Will Be Loved", "Pop"],
+      ["Maroon 5", "Sugar", "Pop"],
+      ["Maroon 5", "Sunday Morning", "Pop"],
+      ["Maroon 5", "This Love", "Pop"],
+      ["Marvin Gaye", "Ain't No Mountain High Enough", "Soul/R&B"],
+      ["Marvin Gaye", "I Heard It Through The Grapevine", "Soul/R&B"],
+      ["Marvin Gaye", "Let's Get It On", "Soul/R&B"],
+      ["Matchbox Twenty", "Unwell", "Rock"],
+      ["Maxwell", "Ascension", "Soul/R&B"],
+      ["Maxwell", "Pretty Wings", "Soul/R&B"],
+      ["Melissa Etheridge", "Come To My Window", "Rock"],
+      ["MGMT", "Electric Feel", "Modern"],
+      ["Michael Bublé", "Everything", "Pop"],
+      ["Michael Bublé", "Feeling Good", "Pop"],
+      ["Michael Bublé", "Home", "Pop"],
+      ["Michael Bublé", "Sway", "Pop"],
+      ["Michael Jackson", "Human Nature", "Pop"],
+      ["Michael Jackson", "Love Never Felt So Good", "Pop"],
+      ["Michael Jackson", "Man In The Mirror", "Pop"],
+      ["Michael Jackson", "Rock With You", "Pop"],
+      ["Michael Jackson", "The Way You Make Me Feel", "Pop"],
+      ["Michael McDonald", "I Keep Forgettin'", "Soul/R&B"],
+      ["Miguel", "Sure Thing", "Soul/R&B"],
+      ["Monica", "Angel Of Mine", "Soul/R&B"],
+      ["Monkees", "I'm A Believer", "Rock"],
+      ["Muni Long", "Made For Me", "Soul/R&B"],
+      ["Muse", "Starlight", "Rock"],
+      ["Musiq Soulchild", "Just Friends", "Soul/R&B"],
+      // ─── N ───
+      ["N'Sync", "Bye Bye Bye", "Pop"],
+      ["Nat King Cole", "L.O.V.E.", "Soul/R&B"],
+      ["Ne-Yo", "Because Of You", "Soul/R&B"],
+      ["Ne-Yo", "Closer", "Soul/R&B"],
+      ["Niall Horan", "Slow Hands", "Modern"],
+      ["Norah Jones", "Don't Know Why", "Soul/R&B"],
+      ["Norah Jones", "Turn Me On", "Soul/R&B"],
+      // ─── O ───
+      ["Oasis", "Wonderwall", "Rock"],
+      ["One Republic", "Apologize", "Pop"],
+      ["One Republic", "Counting Stars", "Pop"],
+      ["Otis Redding", "Sittin' On The Dock Of The Bay", "Soul/R&B"],
+      ["OutKast", "Hey Ya", "Funk"],
+      // ─── P ───
+      ["Pharrell Williams", "Happy", "Funk"],
+      ["Phillip Phillips", "Home", "Modern"],
+      ["Plain White T's", "Hey There Delilah", "Rock"],
+      ["Police", "Every Breath You Take", "Rock"],
+      ["Post Malone", "Circles", "Modern"],
+      ["Post Malone", "Sunflower", "Modern"],
+      ["Prince", "Kiss", "Funk"],
+      ["Prince", "Purple Rain", "Rock"],
+      // ─── Q ───
+      ["Queen", "Crazy Little Thing Called Love", "Rock"],
+      // ─── R ───
+      ["Radiohead", "Creep", "Rock"],
+      ["Randy Newman", "You've Got A Friend In Me", "Pop"],
+      ["Rascal Flatts", "Bless The Broken Road", "Country"],
+      ["Ray Charles", "Georgia On My Mind", "Soul/R&B"],
+      ["Ray Charles", "Hit The Road Jack", "Soul/R&B"],
+      ["Red Hot Chili Peppers", "Under The Bridge", "Rock"],
+      ["Rihanna", "Love On The Brain", "Soul/R&B"],
+      ["Rihanna", "Stay", "Pop"],
+      ["Righteous Brothers", "Unchained Melody", "Soul/R&B"],
+      ["Roberta Flack", "Feel Like Making Love", "Soul/R&B"],
+      ["Robin Thicke", "Lost Without U", "Soul/R&B"],
+      // ─── S ───
+      ["Sade", "Kiss Of Life", "Soul/R&B"],
+      ["Sade", "Smooth Operator", "Soul/R&B"],
+      ["Sam & Dave", "Soul Man", "Soul/R&B"],
+      ["Santana", "Smooth", "Rock"],
+      ["Seal", "Kiss From A Rose", "Pop"],
+      ["Shaboozey", "A Bar Song (Tipsy)", "Country"],
+      ["Sly & The Family Stone", "If You Want Me To Stay", "Funk"],
+      ["Smash Mouth", "All Star", "Rock"],
+      ["Smokey Robinson", "Cruisin'", "Soul/R&B"],
+      ["Starship", "Nothing's Gonna Stop Us Now", "Rock"],
+      ["Stephen Day", "On Top Of The World", "Modern"],
+      ["Stevie Ray Vaughan", "Pride & Joy", "Rock"],
+      ["Stevie Wonder", "All I Do", "Soul/R&B"],
+      ["Stevie Wonder", "I Wish", "Soul/R&B"],
+      ["Stevie Wonder", "Isn't She Lovely", "Soul/R&B"],
+      ["Stevie Wonder", "Master Blaster", "Soul/R&B"],
+      ["Stevie Wonder", "Overjoyed", "Soul/R&B"],
+      ["Stevie Wonder", "Signed, Sealed, Delivered", "Soul/R&B"],
+      ["Stevie Wonder", "Superstition", "Funk"],
+      ["Stone Temple Pilots", "Plush", "Rock"],
+      ["Sublime", "Santeria", "Rock"],
+      ["SWV", "Weak", "Soul/R&B"],
+      // ─── T ───
+      ["Tears For Fears", "Everybody Wants To Rule The World", "Rock"],
+      ["Tears For Fears", "Mad World", "Rock"],
+      ["Teddy Swims", "Lose Control", "Soul/R&B"],
+      ["Temptations", "My Girl", "Soul/R&B"],
+      ["The Killers", "Mr. Brightside", "Rock"],
+      ["The Knack", "My Sharona", "Rock"],
+      ["The La's", "There She Goes", "Rock"],
+      ["The Beatles", "Come Together", "Rock"],
+      ["The Beatles", "Here Comes The Sun", "Rock"],
+      ["The Beatles", "Let It Be", "Rock"],
+      ["The Turtles", "Happy Together", "Rock"],
+      ["The Weeknd", "Blinding Lights", "Pop"],
+      ["The Weeknd", "Earned It", "Soul/R&B"],
+      ["3 Doors Down", "Here Without You", "Rock"],
+      ["311", "Love Song", "Rock"],
+      ["TLC", "Creep", "Soul/R&B"],
+      ["Tom Petty", "Free Fallin'", "Rock"],
+      ["Toto", "Africa", "Rock"],
+      ["Tracy Chapman", "Fast Car", "Modern"],
+      ["Tracy Chapman", "Give Me One Reason", "Modern"],
+      ["Train", "Drops Of Jupiter", "Rock"],
+      ["Train", "Marry Me", "Pop"],
+      // ─── U ───
+      ["Usher", "My Boo", "Soul/R&B"],
+      // ─── V ───
+      ["Van Morrison", "Brown Eyed Girl", "Rock"],
+      ["Van Morrison", "Into The Mystic", "Rock"],
+      ["Van Morrison", "Moondance", "Soul/R&B"],
+      // ─── W ───
+      ["Walk The Moon", "Shut Up & Dance", "Rock"],
+      ["Whitney Houston", "I Wanna Dance With Somebody", "Pop"],
+      ["Whitney Houston", "I Will Always Love You", "Pop"],
+      ["Whitney Houston", "My Love Is Your Love", "Pop"],
+      ["Wild Cherry", "Play That Funky Music", "Funk"],
+      ["Wyclef Jean", "Two Wrongs", "Soul/R&B"],
+      // ─── Y ───
+      ["Young The Giant", "Cough Syrup", "Rock"],
+    ];
+
+    // ─── STATE ───
+    const STATE_KEY = 'jaerich_state';
+    let state = loadState();
+    let currentFilter = 'all';
+    let searchTerm = '';
+    let selectedSong = null;
+    let adminMode = false;
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STATE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch(e) {}
+      return { queue: [], played: [] };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+      } catch(e) {}
+    }
+
+    function getSongKey(artist, title) {
+      return `${artist}|||${title}`;
+    }
+
+    function isSongRequested(artist, title) {
+      const key = getSongKey(artist, title);
+      return state.queue.some(q => q.key === key);
+    }
+
+    function isSongPlayed(artist, title) {
+      const key = getSongKey(artist, title);
+      return state.played.includes(key);
+    }
+
+    // ─── RENDER SONG LIST ───
+    function renderSongs() {
+      const list = document.getElementById('song-list');
+      const countEl = document.getElementById('song-count');
+
+      let filtered = SONGS.filter(([artist, title, genre]) => {
+        if (currentFilter !== 'all' && genre !== currentFilter) return false;
+        if (searchTerm) {
+          const term = searchTerm.toLowerCase();
+          return artist.toLowerCase().includes(term) || title.toLowerCase().includes(term);
+        }
+        return true;
+      });
+
+      countEl.textContent = `${filtered.length} song${filtered.length !== 1 ? 's' : ''} available`;
+
+      list.innerHTML = filtered.map(([artist, title, genre], i) => {
+        const requested = isSongRequested(artist, title);
+        const played = isSongPlayed(artist, title);
+        const statusClass = played ? 'played' : (requested ? 'requested' : '');
+
+        return `<div class="song-item ${statusClass}" data-artist="${escHtml(artist)}" data-title="${escHtml(title)}" style="animation-delay:${Math.min(i * 0.03, 1)}s">
+          <div class="song-info">
+            <div class="song-artist">${escHtml(artist)}</div>
+            <div class="song-title">${escHtml(title)}</div>
+          </div>
+          <span class="song-genre-badge">${escHtml(genre)}</span>
+        </div>`;
+      }).join('');
+
+      // Attach click handlers
+      list.querySelectorAll('.song-item:not(.requested):not(.played)').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedSong = { artist: el.dataset.artist, title: el.dataset.title };
+          openModal();
+        });
+      });
+    }
+
+    // ─── RENDER QUEUE ───
+    function renderQueue() {
+      const queueEl = document.getElementById('queue-list');
+      const countEl = document.getElementById('queue-count');
+
+      if (state.queue.length === 0) {
+        queueEl.innerHTML = '<div class="queue-empty">No requests yet — be the first! 🎵</div>';
+        countEl.textContent = '0 songs';
+        return;
+      }
+
+      countEl.textContent = `${state.queue.length} song${state.queue.length !== 1 ? 's' : ''}`;
+
+      queueEl.innerHTML = '<div class="queue-list">' + state.queue.map((item, i) => {
+        return `<div class="queue-item">
+          <span class="queue-number">${i + 1}</span>
+          <div class="queue-song-info">
+            <div class="queue-song-name">${escHtml(item.title)}</div>
+            <div class="queue-song-artist">${escHtml(item.artist)}</div>
+          </div>
+          ${item.requester ? `<span class="queue-requester">Requested by ${escHtml(item.requester)}</span>` : ''}
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    // ─── MODAL ───
+    function openModal() {
+      if (!selectedSong) return;
+      const modal = document.getElementById('modal');
+      const info = document.getElementById('modal-song-info');
+      const nameInput = document.getElementById('requester-name');
+
+      info.innerHTML = `<strong>${escHtml(selectedSong.artist)}</strong><br>${escHtml(selectedSong.title)}`;
+      nameInput.value = '';
+      modal.classList.add('active');
+      setTimeout(() => nameInput.focus(), 300);
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      selectedSong = null;
+    }
+
+    function submitRequest() {
+      if (!selectedSong) return;
+      const name = document.getElementById('requester-name').value.trim();
+      const key = getSongKey(selectedSong.artist, selectedSong.title);
+
+      // Check if already requested
+      if (state.queue.some(q => q.key === key) || state.played.includes(key)) {
+        closeModal();
+        showToast('This song has already been requested!');
+        return;
+      }
+
+      state.queue.push({
+        key,
+        artist: selectedSong.artist,
+        title: selectedSong.title,
+        requester: name || null,
+        timestamp: Date.now()
+      });
+
+      saveState();
+      closeModal();
+      renderSongs();
+      renderQueue();
+      showToast(`🎵 "${selectedSong.title}" has been added to the queue!`);
+    }
+
+    // ─── ADMIN FUNCTIONS ───
+    function adminMarkPlayed() {
+      if (state.queue.length === 0) return;
+      const item = state.queue.shift();
+      state.played.push(item.key);
+      saveState();
+      renderSongs();
+      renderQueue();
+      showToast(`✓ "${item.title}" marked as played`);
+    }
+
+    function adminSkip() {
+      if (state.queue.length === 0) return;
+      const item = state.queue.shift();
+      saveState();
+      renderSongs();
+      renderQueue();
+      showToast(`⏭ "${item.title}" skipped`);
+    }
+
+    function adminClear() {
+      if (!confirm('Clear the entire queue?')) return;
+      state.queue = [];
+      saveState();
+      renderSongs();
+      renderQueue();
+      showToast('🗑 Queue cleared');
+    }
+
+    function adminReset() {
+      if (!confirm('Reset everything? This clears the queue AND played songs.')) return;
+      state = { queue: [], played: [] };
+      saveState();
+      renderSongs();
+      renderQueue();
+      showToast('↻ All songs reset');
+    }
+
+    // ─── QR CODE ───
+    function generateQR() {
+      let url = window.location.href.split('#')[0] + '#songs';
+      if (url.startsWith('file://')) {
+        url = 'https://jaerichproject.com/#songs';
+      }
+      const container = document.getElementById('qr-canvas');
+      const urlDisplay = document.getElementById('qr-url');
+
+      try {
+        // Use qrcode-generator CDN library
+        const qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+
+        const size = qr.getModuleCount();
+        const cellSize = 6;
+        const margin = 2;
+        const totalSize = (size + margin * 2) * cellSize;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = totalSize;
+        canvas.height = totalSize;
+        canvas.style.borderRadius = '10px';
+        const ctx = canvas.getContext('2d');
+
+        // White background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalSize, totalSize);
+
+        // QR modules — dark color matches site theme
+        ctx.fillStyle = '#0a0a0f';
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            if (qr.isDark(row, col)) {
+              ctx.fillRect(
+                (col + margin) * cellSize,
+                (row + margin) * cellSize,
+                cellSize,
+                cellSize
+              );
+            }
+          }
+        }
+
+        container.innerHTML = '';
+        container.appendChild(canvas);
+        urlDisplay.textContent = url;
+      } catch(e) {
+        // Fallback: use QR server API as image
+        const img = document.createElement('img');
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
+        img.alt = 'QR Code';
+        img.style.borderRadius = '10px';
+        img.style.width = '250px';
+        img.style.height = '250px';
+        container.innerHTML = '';
+        container.appendChild(img);
+        urlDisplay.textContent = url;
+      }
+    }
+
+    // ─── UTILITIES ───
+    function escHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ─── EVENT LISTENERS ───
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-confirm').addEventListener('click', submitRequest);
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modal')) closeModal();
+    });
+
+    document.getElementById('requester-name').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitRequest();
+    });
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      renderSongs();
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.genre;
+        renderSongs();
+      });
+    });
+
+    // Admin toggle (triple-tap on the gear icon)
+    let adminTaps = 0;
+    let adminTimer = null;
+    document.getElementById('admin-toggle').addEventListener('click', () => {
+      adminTaps++;
+      clearTimeout(adminTimer);
+      adminTimer = setTimeout(() => { adminTaps = 0; }, 1000);
+      if (adminTaps >= 3) {
+        adminMode = !adminMode;
+        document.getElementById('admin-bar').classList.toggle('active', adminMode);
+        showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
+        adminTaps = 0;
+      }
+    });
+
+    // Keyboard shortcut for admin (Ctrl+Shift+A)
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        adminMode = !adminMode;
+        document.getElementById('admin-bar').classList.toggle('active', adminMode);
+        showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
+      }
+    });
+
+    // ─── INIT ───
+    renderSongs();
+    renderQueue();
+    generateQR();
+
+    // Refresh queue every 5 seconds (for multi-tab sync)
+    setInterval(() => {
+      const fresh = loadState();
+      if (JSON.stringify(fresh) !== JSON.stringify(state)) {
+        state = fresh;
+        renderSongs();
+        renderQueue();
+      }
+    }, 5000);
+  </script>
+</body>
+</html>
