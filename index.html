@@ -857,6 +857,73 @@
 
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ─── Schedule Section ─── */
+    .schedule-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .gig-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: all 0.2s ease;
+    }
+    .gig-card:hover {
+      border-color: var(--gold-soft);
+      transform: translateY(-2px);
+    }
+    .gig-date {
+      text-align: center;
+      min-width: 60px;
+      padding: 0.5rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--amber) 100%);
+      border-radius: var(--radius-sm);
+    }
+    .gig-date .month {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--bg-deep);
+      letter-spacing: 0.05em;
+    }
+    .gig-date .day {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--bg-deep);
+      line-height: 1.1;
+    }
+    .gig-info {
+      flex: 1;
+    }
+    .gig-venue {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.25rem;
+    }
+    .gig-details {
+      font-size: 0.9rem;
+      color: var(--cream-soft);
+    }
+    .gig-time {
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .no-gigs {
+      text-align: center;
+      color: var(--cream-soft);
+      padding: 2rem;
+      font-style: italic;
+    }
+
     /* ─── Hamburger Nav ─── */
     .nav-bar {
       position: fixed;
@@ -983,8 +1050,12 @@
       Song List
     </a>
     <a href="#qr" class="nav-link">
-      <svg viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-      QR Code
+      <svg viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      Tip Jar
+    </a>
+    <a href="#schedule" class="nav-link">
+      <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Schedule
     </a>
   </div>
 
@@ -1079,6 +1150,30 @@
       <h3>💜 Virtual Tip Jar</h3>
       <p>Scan with your camera to tip — we appreciate you!</p>
       <img src="tip-qr.jpg" alt="Tip QR Code" style="width: 220px; height: 220px; border-radius: 10px;">
+    </div>
+  </section>
+
+  <!-- ═══ SCHEDULE ═══ -->
+  <section class="section" id="schedule">
+    <div class="section-header">
+      <h2>Upcoming Shows</h2>
+      <p>Catch us live at these upcoming events!</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="schedule-grid">
+      <!-- Add your gigs here - copy a gig-card block and update the details -->
+      <div class="gig-card">
+        <div class="gig-date">
+          <div class="month">Feb</div>
+          <div class="day">6</div>
+        </div>
+        <div class="gig-info">
+          <div class="gig-venue">Cyr Wedding Reception</div>
+          <div class="gig-details">Private Event</div>
+          <div class="gig-time">6:00 PM - 10:00 PM</div>
+        </div>
+      </div>
+      <!-- Add more gig-card blocks as needed -->
     </div>
   </section>
 
@@ -1448,7 +1543,22 @@
 
     // ─── STATE ───
     const STATE_KEY = 'jaerich_state';
+    const LAST_CLEAR_KEY = 'jaerich_last_clear';
     let state = loadState();
+
+    // ─── DAILY AUTO-CLEAR ───
+    function checkDailyClear() {
+      const today = new Date().toDateString();
+      const lastClear = localStorage.getItem(LAST_CLEAR_KEY);
+      if (lastClear !== today) {
+        // New day — clear the queue and played list
+        state = { queue: [], played: [] };
+        saveState();
+        localStorage.setItem(LAST_CLEAR_KEY, today);
+        console.log('Daily queue reset performed');
+      }
+    }
+    checkDailyClear();
     let currentFilter = 'all';
     let searchTerm = '';
     let selectedSong = null;
