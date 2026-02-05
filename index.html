@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>THE JAE RICH PROJECT — Live Song Requests</title>
-  <meta name="description" content="The Jae Rich Project — A vocalist/guitarist duo covering rock, soul, pop, funk, motown, top 40 and beyond. Request a song live!">
+  <meta name="description" content="The Jae Rich Project — A duo of soulful vocals, smooth guitar work and feel-good energy covering rock, soul, pop, funk, motown, top 40 and beyond.">
   <meta name="theme-color" content="#0a0a0f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,62 +163,17 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
       letter-spacing: 0.02em;
     }
 
-    .hero-tagline {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
+    .hero-about {
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
       color: var(--cream-soft);
       font-weight: 300;
-      max-width: 500px;
-      line-height: 1.6;
+      max-width: 600px;
+      line-height: 1.8;
       margin-bottom: 2.5rem;
-    }
-
-    .hero-genres {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .genre-tag {
-      padding: 0.35rem 1rem;
-      border-radius: 50px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      backdrop-filter: blur(10px);
-      color: var(--cream-soft);
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2.5rem;
-      background: linear-gradient(135deg, var(--gold), var(--amber));
-      color: var(--bg-deep);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 40px var(--gold-glow);
     }
 
     .scroll-indicator {
@@ -238,101 +193,184 @@
       50% { transform: translateX(-50%) translateY(8px); }
     }
 
-    /* ─── Sections ─── */
-    .section {
-      padding: 5rem 1.5rem;
+    /* ─── Content Tabs ─── */
+    .content-area {
       max-width: 900px;
       margin: 0 auto;
+      padding: 0 1.5rem 3rem;
     }
 
-    .section-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .section-header h2 {
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
-      color: var(--cream);
-      margin-bottom: 0.75rem;
-    }
-
-    .section-header p {
-      color: var(--text-muted);
-      font-size: 1rem;
-      max-width: 500px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-
-    .section-divider {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--gold), var(--amber));
-      margin: 1rem auto 0;
-      border-radius: 1px;
-    }
-
-    /* ─── About ─── */
-    .about-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem;
-      text-align: center;
-    }
-
-    .about-card p {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: var(--cream-soft);
-    }
-
-    .about-stats {
+    .main-tabs {
       display: flex;
       justify-content: center;
-      gap: 3rem;
-      margin-top: 2rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border);
+      gap: 1rem;
+      margin-bottom: 0;
     }
 
-    .stat {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: var(--gold);
+    .main-tab {
+      flex: 1;
+      max-width: 280px;
+      padding: 1.1rem 2rem;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      color: var(--cream-soft);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.15rem;
       font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      position: relative;
+      z-index: 2;
     }
 
-    .stat-label {
-      font-size: 0.75rem;
+    .main-tab svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+
+    .main-tab:hover {
+      color: var(--gold);
+      background: rgba(212, 165, 116, 0.08);
+    }
+
+    .main-tab.active {
+      background: var(--bg-card-solid);
+      color: var(--gold);
+      border-color: var(--gold);
+      border-bottom: 1px solid var(--bg-card-solid);
+      margin-bottom: -1px;
+    }
+
+    .tab-panel {
+      display: none;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--gold);
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Schedule inside tab ─── */
+    .schedule-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .schedule-month {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .schedule-month h3 {
+      font-size: 1.5rem;
+      color: var(--cream);
+      margin-bottom: 0.3rem;
+    }
+
+    .schedule-month p {
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 0.25rem;
+      font-size: 0.9rem;
     }
 
-    /* ─── Tab Navigation ─── */
+    .gig-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      transition: all 0.2s ease;
+    }
+    .gig-card:hover {
+      border-color: rgba(212, 165, 116, 0.3);
+      transform: translateY(-2px);
+    }
+    .gig-date {
+      text-align: center;
+      min-width: 55px;
+      padding: 0.4rem 0.5rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--amber) 100%);
+      border-radius: var(--radius-sm);
+    }
+    .gig-date .month {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--bg-deep);
+      letter-spacing: 0.05em;
+    }
+    .gig-date .day {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--bg-deep);
+      line-height: 1.1;
+    }
+    .gig-info { flex: 1; }
+    .gig-venue {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.15rem;
+    }
+    .gig-details {
+      font-size: 0.85rem;
+      color: var(--cream-soft);
+    }
+    .gig-time {
+      font-size: 0.8rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* ─── Song List inside tab ─── */
+    .song-list-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .song-list-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
     .tabs {
       display: flex;
       justify-content: center;
       gap: 0.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       flex-wrap: wrap;
     }
 
     .tab-btn {
-      padding: 0.6rem 1.5rem;
+      padding: 0.5rem 1.2rem;
       border: 1px solid var(--border);
       border-radius: 50px;
       background: transparent;
       color: var(--cream-soft);
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -347,7 +385,7 @@
     /* ─── Search ─── */
     .search-wrap {
       position: relative;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .search-wrap svg {
@@ -362,7 +400,7 @@
 
     .search-input {
       width: 100%;
-      padding: 1rem 1.25rem 1rem 3.25rem;
+      padding: 0.9rem 1.25rem 0.9rem 3.25rem;
       background: var(--bg-card);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border);
@@ -394,7 +432,7 @@
     .song-item {
       display: flex;
       align-items: center;
-      padding: 1rem 1.25rem;
+      padding: 0.85rem 1rem;
       background: var(--bg-card);
       backdrop-filter: blur(10px);
       border: 1px solid var(--border);
@@ -403,6 +441,13 @@
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .song-item::before {
@@ -433,7 +478,7 @@
     .song-item.requested::after {
       content: 'REQUESTED';
       position: absolute;
-      right: 1.25rem;
+      right: 1rem;
       font-size: 0.65rem;
       font-weight: 700;
       color: var(--success);
@@ -449,7 +494,7 @@
     .song-item.playing::after {
       content: '♪ NOW PLAYING';
       position: absolute;
-      right: 1.25rem;
+      right: 1rem;
       font-size: 0.65rem;
       font-weight: 700;
       color: var(--gold);
@@ -466,7 +511,7 @@
     .song-item.played::after {
       content: 'PLAYED';
       position: absolute;
-      right: 1.25rem;
+      right: 1rem;
       font-size: 0.65rem;
       font-weight: 700;
       color: var(--text-muted);
@@ -481,7 +526,7 @@
     .song-info { flex: 1; min-width: 0; }
 
     .song-artist {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--cream);
       white-space: nowrap;
@@ -490,7 +535,7 @@
     }
 
     .song-title {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       margin-top: 2px;
       white-space: nowrap;
@@ -522,12 +567,12 @@
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      animation: fadeIn 0.3s ease;
+      animation: fadeInModal 0.3s ease;
     }
 
     .modal-overlay.active { display: flex; }
 
-    @keyframes fadeIn {
+    @keyframes fadeInModal {
       from { opacity: 0; }
       to { opacity: 1; }
     }
@@ -619,20 +664,20 @@
       background: var(--bg-card);
       backdrop-filter: blur(20px);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      margin-top: 2rem;
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
     }
 
     .queue-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .queue-header h3 {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: var(--cream);
       display: flex;
       align-items: center;
@@ -657,7 +702,7 @@
 
     .queue-empty {
       text-align: center;
-      padding: 2rem;
+      padding: 1.5rem;
       color: var(--text-muted);
       font-style: italic;
     }
@@ -672,7 +717,7 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.85rem 1rem;
+      padding: 0.75rem 1rem;
       background: rgba(255,255,255,0.03);
       border-radius: var(--radius-sm);
       border: 1px solid transparent;
@@ -725,6 +770,36 @@
     .qr-section {
       text-align: center;
       padding: 4rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      color: var(--cream);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .section-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--amber));
+      margin: 1rem auto 0;
+      border-radius: 1px;
     }
 
     .qr-card {
@@ -857,73 +932,6 @@
 
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ─── Schedule Section ─── */
-    .schedule-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .gig-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      transition: all 0.2s ease;
-    }
-    .gig-card:hover {
-      border-color: var(--gold-soft);
-      transform: translateY(-2px);
-    }
-    .gig-date {
-      text-align: center;
-      min-width: 60px;
-      padding: 0.5rem;
-      background: linear-gradient(135deg, var(--gold) 0%, var(--amber) 100%);
-      border-radius: var(--radius-sm);
-    }
-    .gig-date .month {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: var(--bg-deep);
-      letter-spacing: 0.05em;
-    }
-    .gig-date .day {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--bg-deep);
-      line-height: 1.1;
-    }
-    .gig-info {
-      flex: 1;
-    }
-    .gig-venue {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--cream);
-      margin-bottom: 0.25rem;
-    }
-    .gig-details {
-      font-size: 0.9rem;
-      color: var(--cream-soft);
-    }
-    .gig-time {
-      font-size: 0.85rem;
-      color: var(--gold);
-      font-weight: 500;
-    }
-    .no-gigs {
-      text-align: center;
-      color: var(--cream-soft);
-      padding: 2rem;
-      font-style: italic;
-    }
-
     /* ─── Hamburger Nav ─── */
     .nav-bar {
       position: fixed;
@@ -998,24 +1006,14 @@
 
     /* ─── Responsive ─── */
     @media (max-width: 600px) {
-      .hero { min-height: 90vh; padding-top: 4rem; }
-      .section { padding: 3rem 1rem; }
-      .about-stats { gap: 1.5rem; }
+      .hero { min-height: 85vh; padding-top: 4rem; }
+      .content-area { padding: 0 0.75rem 3rem; }
+      .main-tab { padding: 0.9rem 1rem; font-size: 1rem; }
+      .tab-panel { padding: 1.25rem; }
       .modal { padding: 2rem 1.5rem; }
-      .queue-item { padding: 0.75rem; }
-      .song-item { padding: 0.85rem 1rem; }
+      .queue-item { padding: 0.65rem; }
+      .song-item { padding: 0.75rem 0.85rem; }
       .admin-bar { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
-    }
-
-    /* ─── Fade-in animation for songs ─── */
-    .song-item {
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 0.3s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -1041,21 +1039,17 @@
       <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
       Home
     </a>
-    <a href="#about" class="nav-link">
-      <svg viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      About Us
+    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('dates')">
+      <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Dates
     </a>
-    <a href="#songs" class="nav-link">
+    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('songs')">
       <svg viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
       Song List
     </a>
     <a href="#qr" class="nav-link">
       <svg viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
       Tip Jar
-    </a>
-    <a href="#schedule" class="nav-link">
-      <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-      Schedule
     </a>
   </div>
 
@@ -1068,183 +1062,171 @@
       </svg>
     </div>
     <h1>THE JAE RICH PROJECT</h1>
-    <p class="hero-tagline">A vocalist &amp; guitarist duo delivering unforgettable live covers — from soul to rock and everything in between.</p>
-    <div class="hero-genres">
-      <span class="genre-tag">Rock</span>
-      <span class="genre-tag">Soul</span>
-      <span class="genre-tag">Pop</span>
-      <span class="genre-tag">Funk</span>
-      <span class="genre-tag">Motown</span>
-      <span class="genre-tag">Top 40</span>
-    </div>
-    <a href="#songs" class="btn-primary">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      Request a Song
-    </a>
+    <p class="hero-about">A duo composed of an unforgettable mix of soulful vocals, smooth guitar work and feel-good energy. Delivering live covers ranging from rock, soul, pop to funk, party, motown, top 40 and the list goes on — setting the perfect vibe and tone while ensuring a great time for all!</p>
     <div class="scroll-indicator">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
     </div>
   </section>
 
-  <!-- ═══ SCHEDULE ═══ -->
-  <section class="section" id="schedule">
-    <div class="section-header">
-      <h2>February 2026</h2>
-      <p>Catch us live at Sunquest Solaris, Miramar Beach!</p>
-      <div class="section-divider"></div>
-    </div>
-    <div class="schedule-grid">
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">5</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">6</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Private Event • Miramar Beach</div>
-          <div class="gig-time">6:30 PM - 9:30 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">7</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">8</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">13</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">💕 V-Day Celebration • Public</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">14</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">💕 V-Day Celebration • Public</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">15</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">💕 V-Day Celebration • Public</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">20</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">21</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">22</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">27</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-      <div class="gig-card">
-        <div class="gig-date"><div class="month">Feb</div><div class="day">28</div></div>
-        <div class="gig-info">
-          <div class="gig-venue">Sunquest Solaris</div>
-          <div class="gig-details">Public • Miramar Beach</div>
-          <div class="gig-time">5:00 PM - 8:00 PM</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ ABOUT ═══ -->
-  <section class="section" id="about">
-    <div class="section-header">
-      <h2>About Us</h2>
-      <div class="section-divider"></div>
-    </div>
-    <div class="about-card">
-      <p>The Jae Rich Project is a vocalist/guitarist duo covering a wide variety of music genres ranging from rock, soul, pop to funk, party, motown, top 40 and the list goes on — ensuring a great time for all!</p>
-    </div>
-  </section>
-
-  <!-- ═══ SONG LIST ═══ -->
-  <section class="section" id="songs">
-    <div class="section-header">
-      <h2>Song List</h2>
-      <p>Tap any song to request it. The playlist builds live as requests come in!</p>
-      <div class="section-divider"></div>
+  <!-- ═══ TABBED CONTENT ═══ -->
+  <div class="content-area" id="content-area">
+    <div class="main-tabs">
+      <button class="main-tab active" id="tab-dates" onclick="switchTab('dates')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Dates
+      </button>
+      <button class="main-tab" id="tab-songs" onclick="switchTab('songs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
+        Song List
+      </button>
     </div>
 
-    <!-- Filters -->
-    <div class="tabs" id="genre-tabs">
-      <button class="tab-btn active" data-genre="all">All</button>
-      <button class="tab-btn" data-genre="Rock">Rock</button>
-      <button class="tab-btn" data-genre="Soul/R&B">Soul/R&B</button>
-      <button class="tab-btn" data-genre="Pop">Pop</button>
-      <button class="tab-btn" data-genre="Funk">Funk</button>
-      <button class="tab-btn" data-genre="Country">Country</button>
-      <button class="tab-btn" data-genre="Modern">Modern</button>
-    </div>
-
-    <!-- Search -->
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" class="search-input" id="search" placeholder="Search by artist or song...">
-    </div>
-
-    <div class="song-count" id="song-count"></div>
-
-    <!-- Song List -->
-    <div class="song-list" id="song-list"></div>
-
-    <!-- Live Queue -->
-    <div class="queue-section" id="queue-section">
-      <div class="queue-header">
-        <h3><span class="queue-live-dot"></span> Live Queue</h3>
-        <span class="queue-count" id="queue-count">0 songs</span>
+    <!-- ─── DATES PANEL ─── -->
+    <div class="tab-panel active" id="panel-dates">
+      <div class="schedule-month">
+        <h3>February 2026</h3>
+        <p>Catch us live at Sunquest Solaris, Miramar Beach!</p>
       </div>
-      <div id="queue-list">
-        <div class="queue-empty">No requests yet — be the first! 🎵</div>
+      <div class="schedule-grid">
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">5</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">6</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Private Event • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">7</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">8</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">13</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">💕 V-Day Celebration • Public</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">14</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">💕 V-Day Celebration • Public</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">15</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">💕 V-Day Celebration • Public</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">20</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">21</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">22</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">27</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card">
+          <div class="gig-date"><div class="month">Feb</div><div class="day">28</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">5:00 PM - 8:00 PM</div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+
+    <!-- ─── SONGS PANEL ─── -->
+    <div class="tab-panel" id="panel-songs">
+      <div class="song-list-header">
+        <p>Tap any song to request it. The playlist builds live as requests come in!</p>
+      </div>
+
+      <!-- Genre Filters -->
+      <div class="tabs" id="genre-tabs">
+        <button class="tab-btn active" data-genre="all">All</button>
+        <button class="tab-btn" data-genre="Rock">Rock</button>
+        <button class="tab-btn" data-genre="Soul/R&B">Soul/R&B</button>
+        <button class="tab-btn" data-genre="Pop">Pop</button>
+        <button class="tab-btn" data-genre="Funk">Funk</button>
+        <button class="tab-btn" data-genre="Country">Country</button>
+        <button class="tab-btn" data-genre="Modern">Modern</button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="search" placeholder="Search by artist or song...">
+      </div>
+
+      <div class="song-count" id="song-count"></div>
+
+      <!-- Song List -->
+      <div class="song-list" id="song-list"></div>
+
+      <!-- Live Queue -->
+      <div class="queue-section" id="queue-section">
+        <div class="queue-header">
+          <h3><span class="queue-live-dot"></span> Live Queue</h3>
+          <span class="queue-count" id="queue-count">0 songs</span>
+        </div>
+        <div id="queue-list">
+          <div class="queue-empty">No requests yet — be the first! 🎵</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══ QR CODE ═══ -->
   <section class="qr-section" id="qr">
@@ -1307,6 +1289,23 @@
     // ═══════════════════════════════════════════════════
     // THE JAE RICH PROJECT — Song Request System
     // ═══════════════════════════════════════════════════
+
+    // ─── TAB SWITCHING ───
+    function switchTab(tab) {
+      // Update tab buttons
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+
+      // Update panels
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + tab).classList.add('active');
+
+      // Scroll to content area
+      document.getElementById('content-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Close nav if open
+      closeNav();
+    }
 
     // ─── SONG DATABASE ───
     // Format: [Artist, Song Title, Genre]
@@ -1634,7 +1633,6 @@
       const today = new Date().toDateString();
       const lastClear = localStorage.getItem(LAST_CLEAR_KEY);
       if (lastClear !== today) {
-        // New day — clear the queue and played list
         state = { queue: [], played: [] };
         saveState();
         localStorage.setItem(LAST_CLEAR_KEY, today);
@@ -1762,7 +1760,6 @@
       const name = document.getElementById('requester-name').value.trim();
       const key = getSongKey(selectedSong.artist, selectedSong.title);
 
-      // Check if already requested
       if (state.queue.some(q => q.key === key) || state.played.includes(key)) {
         closeModal();
         showToast('This song has already been requested!');
@@ -1832,7 +1829,6 @@
       const urlDisplay = document.getElementById('qr-url');
 
       try {
-        // Use qrcode-generator CDN library
         const qr = qrcode(0, 'M');
         qr.addData(url);
         qr.make();
@@ -1848,11 +1844,9 @@
         canvas.style.borderRadius = '10px';
         const ctx = canvas.getContext('2d');
 
-        // White background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, totalSize, totalSize);
 
-        // QR modules — dark color matches site theme
         ctx.fillStyle = '#0a0a0f';
         for (let row = 0; row < size; row++) {
           for (let col = 0; col < size; col++) {
@@ -1871,7 +1865,6 @@
         container.appendChild(canvas);
         urlDisplay.textContent = url;
       } catch(e) {
-        // Fallback: use QR server API as image
         const img = document.createElement('img');
         img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
         img.alt = 'QR Code';
@@ -1947,12 +1940,6 @@
       }
     });
 
-    // ─── INIT ───
-    renderSongs();
-    renderQueue();
-    generateQR();
-
-    // Refresh queue every 5 seconds (for multi-tab sync)
     // ─── HAMBURGER NAV ───
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
@@ -1971,12 +1958,28 @@
     }
     hamburger.addEventListener('click', toggleNav);
     navOverlay.addEventListener('click', closeNav);
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.nav-menu .nav-link').forEach(link => {
       link.addEventListener('click', closeNav);
     });
     window.addEventListener('scroll', () => {
       navBar.classList.toggle('scrolled', window.scrollY > 50);
     }, { passive: true });
+
+    // ─── HANDLE HASH ON LOAD ───
+    function handleHash() {
+      const hash = window.location.hash;
+      if (hash === '#songs') {
+        switchTab('songs');
+      } else if (hash === '#dates') {
+        switchTab('dates');
+      }
+    }
+
+    // ─── INIT ───
+    renderSongs();
+    renderQueue();
+    generateQR();
+    handleHash();
 
     // Refresh queue every 5 seconds (for multi-tab sync)
     setInterval(() => {
