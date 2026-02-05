@@ -1,0 +1,2 @@
+# Redirect www to apex domain
+https://www.jaerichent.com/* https://jaerichent.com/:splat 301
