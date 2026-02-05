@@ -1087,8 +1087,8 @@
         <h3>February 2026</h3>
         <p>Catch us live at Sunquest Solaris, Miramar Beach!</p>
       </div>
-      <div class="schedule-grid">
-        <div class="gig-card">
+      <div class="schedule-grid" id="schedule-grid">
+        <div class="gig-card" data-date="2026-02-05">
           <div class="gig-date"><div class="month">Feb</div><div class="day">5</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1096,7 +1096,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-06">
           <div class="gig-date"><div class="month">Feb</div><div class="day">6</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1104,7 +1104,7 @@
             <div class="gig-time">6:30 PM - 9:30 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-07">
           <div class="gig-date"><div class="month">Feb</div><div class="day">7</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1112,7 +1112,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-08">
           <div class="gig-date"><div class="month">Feb</div><div class="day">8</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1120,7 +1120,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-13">
           <div class="gig-date"><div class="month">Feb</div><div class="day">13</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1128,7 +1128,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-14">
           <div class="gig-date"><div class="month">Feb</div><div class="day">14</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1136,7 +1136,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-15">
           <div class="gig-date"><div class="month">Feb</div><div class="day">15</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1144,7 +1144,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-20">
           <div class="gig-date"><div class="month">Feb</div><div class="day">20</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1152,7 +1152,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-21">
           <div class="gig-date"><div class="month">Feb</div><div class="day">21</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1160,7 +1160,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-22">
           <div class="gig-date"><div class="month">Feb</div><div class="day">22</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1168,7 +1168,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-27">
           <div class="gig-date"><div class="month">Feb</div><div class="day">27</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1176,7 +1176,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
-        <div class="gig-card">
+        <div class="gig-card" data-date="2026-02-28">
           <div class="gig-date"><div class="month">Feb</div><div class="day">28</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -1184,6 +1184,7 @@
             <div class="gig-time">5:00 PM - 8:00 PM</div>
           </div>
         </div>
+        <div class="no-gigs" id="no-gigs" style="display:none;">No upcoming dates — check back soon! 🎶</div>
       </div>
     </div>
 
@@ -1975,7 +1976,32 @@
       }
     }
 
+    // ─── AUTO-HIDE PAST GIG DATES ───
+    function hidePastGigs() {
+      const today = new Date();
+      // Zero out time so we compare dates only
+      today.setHours(0, 0, 0, 0);
+      const cards = document.querySelectorAll('.gig-card[data-date]');
+      let visibleCount = 0;
+      cards.forEach(card => {
+        // Parse as local date (YYYY-MM-DD)
+        const parts = card.dataset.date.split('-');
+        const gigDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        if (gigDate < today) {
+          card.style.display = 'none';
+        } else {
+          visibleCount++;
+        }
+      });
+      // Show "no gigs" message if all dates have passed
+      const noGigs = document.getElementById('no-gigs');
+      if (noGigs) {
+        noGigs.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    }
+
     // ─── INIT ───
+    hidePastGigs();
     renderSongs();
     renderQueue();
     generateQR();
