@@ -310,6 +310,63 @@
       border-color: rgba(212, 165, 116, 0.3);
       transform: translateY(-2px);
     }
+    .gig-card.next-up {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(212,165,116,0.08), rgba(201,115,91,0.05));
+      box-shadow: 0 0 30px rgba(212, 165, 116, 0.1);
+    }
+    .next-up-label {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .more-dates-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem;
+      margin-top: 0.75rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--cream-soft);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .more-dates-toggle:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .more-dates-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      transition: transform 0.3s ease;
+    }
+    .more-dates-toggle.expanded svg {
+      transform: rotate(180deg);
+    }
+    .more-dates-list {
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .more-dates-list.open {
+      display: flex;
+    }
     .gig-date {
       text-align: center;
       min-width: 55px;
@@ -1979,32 +2036,80 @@
       }
     }
 
-    // ─── AUTO-HIDE PAST GIG DATES ───
-    function hidePastGigs() {
+    // ─── AUTO-HIDE PAST GIGS & COLLAPSE FUTURE ───
+    function setupGigDates() {
       const today = new Date();
-      // Zero out time so we compare dates only
       today.setHours(0, 0, 0, 0);
-      const cards = document.querySelectorAll('.gig-card[data-date]');
-      let visibleCount = 0;
+      const grid = document.getElementById('schedule-grid');
+      const cards = Array.from(grid.querySelectorAll('.gig-card[data-date]'));
+      const noGigs = document.getElementById('no-gigs');
+
+      // Split into past and upcoming
+      const upcoming = [];
       cards.forEach(card => {
-        // Parse as local date (YYYY-MM-DD)
         const parts = card.dataset.date.split('-');
         const gigDate = new Date(parts[0], parts[1] - 1, parts[2]);
         if (gigDate < today) {
           card.style.display = 'none';
         } else {
-          visibleCount++;
+          upcoming.push(card);
         }
       });
-      // Show "no gigs" message if all dates have passed
-      const noGigs = document.getElementById('no-gigs');
-      if (noGigs) {
-        noGigs.style.display = visibleCount === 0 ? 'block' : 'none';
+
+      if (upcoming.length === 0) {
+        if (noGigs) noGigs.style.display = 'block';
+        return;
+      }
+
+      // First upcoming = "Next Up" (always visible)
+      const nextUp = upcoming[0];
+      nextUp.classList.add('next-up');
+      const label = document.createElement('div');
+      label.className = 'next-up-label';
+      label.textContent = '⭐ Next Up';
+      nextUp.parentNode.insertBefore(label, nextUp);
+
+      // Remaining dates go into collapsible section
+      if (upcoming.length > 1) {
+        const remaining = upcoming.slice(1);
+        const moreCount = remaining.length;
+
+        // Create toggle button
+        const toggle = document.createElement('button');
+        toggle.className = 'more-dates-toggle';
+        toggle.id = 'more-dates-toggle';
+        toggle.innerHTML = `<span>${moreCount} more date${moreCount > 1 ? 's' : ''}</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`;
+
+        // Create container for remaining dates
+        const moreList = document.createElement('div');
+        moreList.className = 'more-dates-list';
+        moreList.id = 'more-dates-list';
+
+        // Move remaining cards into the collapsible container
+        remaining.forEach(card => {
+          moreList.appendChild(card);
+        });
+
+        // Insert after the next-up card
+        nextUp.after(toggle);
+        toggle.after(moreList);
+
+        // Toggle handler
+        toggle.addEventListener('click', () => {
+          const list = document.getElementById('more-dates-list');
+          const isOpen = list.classList.contains('open');
+          list.classList.toggle('open');
+          toggle.classList.toggle('expanded');
+          const label = toggle.querySelector('span');
+          label.textContent = isOpen 
+            ? `${moreCount} more date${moreCount > 1 ? 's' : ''}`
+            : 'Hide dates';
+        });
       }
     }
 
     // ─── INIT ───
-    hidePastGigs();
+    setupGigDates();
     renderSongs();
     renderQueue();
     generateQR();
