@@ -883,19 +883,7 @@
       margin-bottom: 1.5rem;
     }
 
-    #qr-canvas {
-      background: white;
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      display: inline-block;
-    }
-
-    .qr-url {
-      margin-top: 1rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      word-break: break-all;
-    }
+    /* removed qr-canvas and qr-url styles */
 
     /* ─── Admin Bar ─── */
     .admin-bar {
@@ -1313,7 +1301,7 @@
     </div>
   </div>
 
-  <!-- ═══ QR CODE ═══ -->
+  <!-- ═══ TIP JAR ═══ -->
   <section class="qr-section" id="qr">
     <div class="section-header">
       <h2>Show Some Love</h2>
@@ -1323,9 +1311,7 @@
     <div class="qr-card">
       <h3>💜 Virtual Tip Jar</h3>
       <p>Enjoying the music? We appreciate your support!</p>
-      <a href="https://dot.cards/jaerich?e=ZGV2aWNlLW50eHR3ZG9mdWdhZGpmdHRlZjNtaTJmaGItYy1ibA" target="_blank" rel="noopener noreferrer" style="display:inline-block; margin-bottom:1.25rem; padding:0.75rem 2rem; background:linear-gradient(135deg, var(--gold), var(--amber)); color:var(--bg-deep); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; border-radius:50px; text-decoration:none; text-transform:uppercase; letter-spacing:0.05em; transition:all 0.3s ease;">Tap to Tip 💛</a>
-      <br>
-      <img src="tip-qr.jpg" alt="Tip QR Code" style="width: 220px; height: 220px; border-radius: 10px;">
+      <a href="https://dot.cards/jaerich?e=ZGV2aWNlLW50eHR3ZG9mdWdhZGpmdHRlZjNtaTJmaGItYy1ibA" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding:0.75rem 2rem; background:linear-gradient(135deg, var(--gold), var(--amber)); color:var(--bg-deep); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; border-radius:50px; text-decoration:none; text-transform:uppercase; letter-spacing:0.05em; transition:all 0.3s ease;">Tap to Tip 💛</a>
     </div>
   </section>
 
@@ -1368,9 +1354,6 @@
     <button class="admin-btn danger" onclick="adminClear()">🗑 Clear Queue</button>
     <button class="admin-btn danger" onclick="adminReset()">↻ Reset All Songs</button>
   </div>
-
-  <!-- QR Code via CDN library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 
   <script>
     // ═══════════════════════════════════════════════════
@@ -1906,64 +1889,6 @@
       showToast('↻ All songs reset');
     }
 
-    // ─── QR CODE ───
-    function generateQR() {
-      let url = window.location.href.split('#')[0] + '#songs';
-      if (url.startsWith('file://')) {
-        url = 'https://jaerichent.com/#songs';
-      }
-      const container = document.getElementById('qr-canvas');
-      const urlDisplay = document.getElementById('qr-url');
-
-      try {
-        const qr = qrcode(0, 'M');
-        qr.addData(url);
-        qr.make();
-
-        const size = qr.getModuleCount();
-        const cellSize = 6;
-        const margin = 2;
-        const totalSize = (size + margin * 2) * cellSize;
-
-        const canvas = document.createElement('canvas');
-        canvas.width = totalSize;
-        canvas.height = totalSize;
-        canvas.style.borderRadius = '10px';
-        const ctx = canvas.getContext('2d');
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, totalSize, totalSize);
-
-        ctx.fillStyle = '#0a0a0f';
-        for (let row = 0; row < size; row++) {
-          for (let col = 0; col < size; col++) {
-            if (qr.isDark(row, col)) {
-              ctx.fillRect(
-                (col + margin) * cellSize,
-                (row + margin) * cellSize,
-                cellSize,
-                cellSize
-              );
-            }
-          }
-        }
-
-        container.innerHTML = '';
-        container.appendChild(canvas);
-        urlDisplay.textContent = url;
-      } catch(e) {
-        const img = document.createElement('img');
-        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(url);
-        img.alt = 'QR Code';
-        img.style.borderRadius = '10px';
-        img.style.width = '250px';
-        img.style.height = '250px';
-        container.innerHTML = '';
-        container.appendChild(img);
-        urlDisplay.textContent = url;
-      }
-    }
-
     // ─── UTILITIES ───
     function escHtml(str) {
       const div = document.createElement('div');
@@ -2140,7 +2065,6 @@
     setupGigDates();
     renderSongs();
     renderQueue();
-    generateQR();
     handleHash();
 
     // Refresh queue every 5 seconds (for multi-tab sync)
