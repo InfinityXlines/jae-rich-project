@@ -27,9 +27,9 @@
       --amber: #c9735b;
       --purple: #7c5cbf;
       --purple-soft: rgba(124, 92, 191, 0.15);
-      --cream: #f5f0e8;
-      --cream-soft: rgba(245, 240, 232, 0.7);
-      --text-muted: rgba(245, 240, 232, 0.5);
+      --cream: #ffffff;
+      --cream-soft: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.75);
       --border: rgba(212, 165, 116, 0.12);
       --success: #5cb87a;
       --radius: 16px;
@@ -172,7 +172,7 @@
 
     .hero-about {
       font-size: clamp(1.1rem, 2.8vw, 1.35rem);
-      color: var(--cream);
+      color: #ffffff;
       font-weight: 400;
       max-width: 600px;
       line-height: 1.8;
@@ -187,9 +187,10 @@
       animation: bounce 2s ease-in-out infinite;
     }
     .scroll-indicator svg {
-      width: 24px;
-      height: 24px;
+      width: 36px;
+      height: 36px;
       stroke: var(--text-muted);
+      stroke-width: 2.5;
     }
     @keyframes bounce {
       0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -293,7 +294,7 @@
 
     .schedule-month p {
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 1.05rem;
     }
 
     .gig-card {
@@ -389,17 +390,17 @@
     }
     .gig-info { flex: 1; }
     .gig-venue {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--cream);
       margin-bottom: 0.15rem;
     }
     .gig-details {
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: var(--cream-soft);
     }
     .gig-time {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       color: var(--gold);
       font-weight: 500;
     }
@@ -412,7 +413,7 @@
 
     .song-list-header p {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 1.05rem;
     }
 
     .tabs {
@@ -478,7 +479,7 @@
     /* ─── Song List ─── */
     .song-count {
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: var(--text-muted);
       margin-bottom: 1rem;
     }
@@ -586,7 +587,7 @@
     .song-info { flex: 1; min-width: 0; }
 
     .song-artist {
-      font-size: 0.9rem;
+      font-size: 1.05rem;
       font-weight: 600;
       color: var(--cream);
       white-space: nowrap;
@@ -595,7 +596,7 @@
     }
 
     .song-title {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
       margin-top: 2px;
       white-space: nowrap;
@@ -850,7 +851,7 @@
 
     .section-header p {
       color: var(--text-muted);
-      font-size: 1rem;
+      font-size: 1.1rem;
       max-width: 500px;
       margin: 0 auto;
       line-height: 1.6;
@@ -959,7 +960,7 @@
     }
 
     .footer-text {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
     }
 
