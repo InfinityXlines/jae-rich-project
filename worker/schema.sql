@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS requests (
   to_name TEXT,
   comments TEXT,
   created_at INTEGER NOT NULL,
-  played INTEGER DEFAULT 0
+  played INTEGER DEFAULT 0,
+  archived INTEGER DEFAULT 0
 );
-CREATE INDEX IF NOT EXISTS idx_requests_pending ON requests (played, created_at);
+CREATE INDEX IF NOT EXISTS idx_requests_pending ON requests (played, archived, created_at);
+
+-- Small key/value store (cached gig windows parsed from the live site)
+CREATE TABLE IF NOT EXISTS meta (
+  k TEXT PRIMARY KEY,
+  v TEXT NOT NULL
+);

@@ -2,6 +2,11 @@ name = "jrp-live-queue"
 main = "src/index.js"
 compatibility_date = "2026-01-01"
 
+# Auto-reset check: re-parse gig times from jaerichent.com and archive
+# the queue 30 min before / 30 min after each gig window.
+[triggers]
+crons = ["*/5 * * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "jrp-live-queue"
