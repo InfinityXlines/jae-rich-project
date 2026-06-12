@@ -1,0 +1,8 @@
+name = "jrp-live-queue"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jrp-live-queue"
+database_id = "62424991-17b1-4ae7-ac51-90885f56acdf"
