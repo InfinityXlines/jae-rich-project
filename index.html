@@ -1220,6 +1220,129 @@
     /* ─── Toast: springy entrance ─── */
     .toast { transition: transform 0.55s var(--ease-spring); }
 
+    /* ─── Grand entrance: stage-curtain intro ───
+       Shown once per session on a clean visit (no deep-link hash).
+       Pure CSS timeline with `forwards` fills — even if JS dies the
+       curtains still open and the overlay releases pointer events. */
+    #intro { display: none; }
+    html.with-intro #intro {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      pointer-events: none;
+    }
+    .intro-half {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50.5%;
+      background: #060609;
+    }
+    .intro-half.top { top: 0; animation: curtainUp 0.8s cubic-bezier(0.7, 0, 0.3, 1) 1.15s forwards; }
+    .intro-half.bottom { bottom: 0; animation: curtainDown 0.8s cubic-bezier(0.7, 0, 0.3, 1) 1.15s forwards; }
+    @keyframes curtainUp { to { transform: translateY(-101%); } }
+    @keyframes curtainDown { to { transform: translateY(101%); } }
+    .intro-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .intro-eq {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      height: 34px;
+      animation: introEqOut 0.35s ease 0.78s forwards;
+    }
+    .intro-eq span {
+      width: 6px;
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--gold-light), var(--amber));
+      transform-origin: bottom;
+      animation: introEqPulse 0.42s ease-in-out 3 alternate;
+    }
+    .intro-eq span:nth-child(1) { animation-delay: 0.05s; }
+    .intro-eq span:nth-child(2) { animation-delay: 0.18s; }
+    .intro-eq span:nth-child(3) { animation-delay: 0.31s; }
+    @keyframes introEqPulse {
+      from { transform: scaleY(0.15); }
+      to   { transform: scaleY(1); }
+    }
+    @keyframes introEqOut {
+      to { opacity: 0; transform: scale(0.6); }
+    }
+    .intro-line {
+      position: absolute;
+      height: 1px;
+      width: min(420px, 70vw);
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      animation: introLineIn 0.4s var(--ease-out-expo) 0.95s forwards,
+                 introLineOut 0.5s ease 1.45s forwards;
+    }
+    @keyframes introLineIn { to { transform: scaleX(1); } }
+    @keyframes introLineOut { to { opacity: 0; } }
+
+    /* Hold the hero entrance until the curtains part */
+    html.with-intro .hero-logo { animation-delay: 1.45s; }
+    html.with-intro .hero h1 { animation-delay: 1.7s, 2.9s; }
+    html.with-intro .hero-about { animation-delay: 1.95s; }
+    html.with-intro .scroll-indicator { animation-delay: 0s, 2.55s; }
+
+    /* ─── Glassy ambience ─── */
+    /* Edge light: the 1px catch of light along the top of glass */
+    .gig-card, .tab-panel, .queue-section, .song-item, .dj-input, .main-tab {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    }
+    .gig-card { position: relative; overflow: hidden; }
+    .gig-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -70%;
+      width: 55%;
+      background: linear-gradient(105deg,
+        transparent 0%, rgba(255, 255, 255, 0.05) 38%,
+        rgba(255, 255, 255, 0.13) 50%,
+        rgba(255, 255, 255, 0.05) 62%, transparent 100%);
+      transform: skewX(-14deg);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .gig-card.shining::after {
+      opacity: 1;
+      animation: shineSweep 1.2s ease forwards;
+    }
+    @keyframes shineSweep {
+      to { transform: skewX(-14deg) translateX(320%); }
+    }
+
+    /* Drifting gold music notes (hero & gaps only — behind panels) */
+    .float-note {
+      position: fixed;
+      bottom: -3rem;
+      z-index: 0;
+      color: var(--gold);
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      animation: noteRise linear forwards;
+    }
+    @keyframes noteRise {
+      0%   { transform: translateY(0) translateX(0) rotate(-8deg); opacity: 0; }
+      12%  { opacity: 0.28; }
+      45%  { transform: translateY(-45vh) translateX(2.2rem) rotate(10deg); }
+      80%  { opacity: 0.18; }
+      100% { transform: translateY(-108vh) translateX(-1.5rem) rotate(-6deg); opacity: 0; }
+    }
+
     /* ─── DJ Request: gig-time-only tab ─── */
     #tab-dj { display: none; }
     body.dj-live #tab-dj {
@@ -1424,8 +1547,33 @@
       }
     }
   </style>
+  <script>
+    // Decide on the grand-entrance intro BEFORE first paint:
+    // once per session, clean visits only (QR deep-links skip it),
+    // and never for reduced-motion users.
+    (function () {
+      try {
+        if (!location.hash &&
+            !sessionStorage.getItem('jrp_intro_seen') &&
+            !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('with-intro');
+          sessionStorage.setItem('jrp_intro_seen', '1');
+        }
+      } catch (e) { /* storage blocked: just skip the intro */ }
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- ═══ GRAND ENTRANCE (once per session) ═══ -->
+  <div id="intro" aria-hidden="true">
+    <div class="intro-half top"></div>
+    <div class="intro-half bottom"></div>
+    <div class="intro-center">
+      <div class="intro-eq"><span></span><span></span><span></span></div>
+      <div class="intro-line"></div>
+    </div>
+  </div>
 
   <!-- Ambient Background -->
   <div class="ambient">
@@ -3196,6 +3344,53 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) updateDJVisibility();
     });
+
+    // ─── GRAND ENTRANCE & GLASSY AMBIENCE ───
+    // Intro overlay: the CSS timeline already opened the curtains;
+    // this just removes the dead nodes once the show has started.
+    (function introCleanup() {
+      const intro = document.getElementById('intro');
+      if (!intro) return;
+      if (!document.documentElement.classList.contains('with-intro')) { intro.remove(); return; }
+      setTimeout(() => intro.remove(), 2300);
+    })();
+
+    // Drifting gold music notes — sparse, hero-and-gaps only
+    (function ambientNotes() {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const glyphs = ['♪', '♫', '♩', '♬'];
+      function spawn() {
+        if (document.hidden) return;
+        if (document.querySelectorAll('.float-note').length >= 3) return;
+        const n = document.createElement('span');
+        n.className = 'float-note';
+        n.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        n.style.left = (6 + Math.random() * 86) + 'vw';
+        n.style.fontSize = (0.9 + Math.random() * 0.9) + 'rem';
+        n.style.animationDuration = (9 + Math.random() * 6) + 's';
+        document.body.appendChild(n);
+        n.addEventListener('animationend', () => n.remove());
+      }
+      setTimeout(spawn, 3800);
+      setInterval(spawn, 8000);
+    })();
+
+    // Occasional glossy shine sweep across a visible gig card
+    (function glassShine() {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      function sweep() {
+        if (document.hidden) return;
+        const candidates = [...document.querySelectorAll('.gig-card')].filter(c => {
+          const r = c.getBoundingClientRect();
+          return r.height > 0 && r.top < innerHeight && r.bottom > 0;
+        });
+        if (!candidates.length) return;
+        const card = candidates[Math.floor(Math.random() * candidates.length)];
+        card.classList.add('shining');
+        setTimeout(() => card.classList.remove('shining'), 1300);
+      }
+      setInterval(sweep, 9000);
+    })();
 
     // ─── SCROLL REVEAL ───
     // Staggered rise-in for gig cards & sections as they enter the
