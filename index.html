@@ -1218,6 +1218,120 @@
     /* ─── Toast: springy entrance ─── */
     .toast { transition: transform 0.55s var(--ease-spring); }
 
+    /* ─── DJ Request: gig-time-only tab ─── */
+    #tab-dj { display: none; }
+    body.dj-live #tab-dj {
+      display: flex;
+      animation: djTabPop 0.7s var(--ease-spring) both;
+    }
+    @keyframes djTabPop {
+      0%   { opacity: 0; transform: scale(0.7) translateY(10px); }
+      60%  { opacity: 1; transform: scale(1.06) translateY(-3px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .onair-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 50px;
+      background: rgba(255, 59, 48, 0.12);
+      border: 1px solid rgba(255, 59, 48, 0.5);
+      color: #ff6b61;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .onair-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ff3b30;
+      box-shadow: 0 0 10px rgba(255, 59, 48, 0.8);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .main-tab .onair-dot {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+    }
+    .dj-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 520px;
+      margin: 1.5rem auto;
+      position: relative;
+    }
+    .dj-input {
+      width: 100%;
+      padding: 0.95rem 1.1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.05rem;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .dj-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
+    }
+    .dj-input::placeholder { color: rgba(255, 255, 255, 0.45); }
+    .dj-submit {
+      padding: 1.05rem 2rem;
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+    }
+    .dj-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px var(--gold-glow);
+    }
+    .dj-submit:active { transform: scale(0.96); }
+    .dj-quickpick {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      z-index: 20;
+      display: none;
+      animation: panelIn 0.25s var(--ease-out-expo);
+    }
+    .dj-quickpick.open { display: block; }
+    .dj-quickpick-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s ease;
+    }
+    .dj-quickpick-item:last-child { border-bottom: none; }
+    .dj-quickpick-item:hover, .dj-quickpick-item:active { background: var(--purple-soft); }
+    .dj-quickpick-item .qp-artist { color: var(--gold); font-weight: 600; white-space: nowrap; }
+    .dj-quickpick-item .qp-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dj-field-wrap { position: relative; }
+
     /* ─── Accessibility: respect reduced motion ─── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1299,6 +1413,11 @@
       <button class="main-tab" id="tab-songs" onclick="switchTab('songs')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
         Song List
+      </button>
+      <button class="main-tab" id="tab-dj" onclick="switchTab('dj')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3m18 5a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3"/></svg>
+        DJ Request
+        <span class="onair-dot"></span>
       </button>
       <button class="main-tab" id="tab-contact" onclick="switchTab('contact')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -2202,6 +2321,33 @@
     </div>
 
     <!-- ─── CONTACT PANEL ─── -->
+    <!-- ─── DJ REQUEST PANEL (gig-time only) ─── -->
+    <div class="tab-panel" id="panel-dj">
+      <div style="text-align:center; margin-bottom:0.5rem;">
+        <span class="onair-badge"><span class="onair-dot"></span> On Air</span>
+        <h3 style="font-size:1.6rem; color:var(--gold); margin:1rem 0 0.4rem;">DJ Request Line</h3>
+        <p style="color:var(--cream-soft); font-size:1.05rem;">We're live! Request <em>any</em> song — if we can spin it, we will. 🎧</p>
+      </div>
+      <div class="dj-form">
+        <div class="dj-field-wrap">
+          <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="60" autocomplete="off">
+          <div class="dj-quickpick" id="dj-quickpick"></div>
+        </div>
+        <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="60" autocomplete="off">
+        <input type="text" class="dj-input" id="dj-name" placeholder="Your name (optional)" maxlength="30" autocomplete="off">
+        <button class="dj-submit" id="dj-submit">🎧 Send It to the Booth</button>
+      </div>
+      <div class="queue-section">
+        <div class="queue-header">
+          <h3><span class="queue-live-dot"></span> DJ Live Queue</h3>
+          <span class="queue-count" id="dj-queue-count">0 songs</span>
+        </div>
+        <div id="dj-queue-list">
+          <div class="queue-empty">Booth is open — drop the first request! 🎧</div>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-panel" id="panel-contact">
       <div style="text-align:center; padding:1rem 0;">
         <div style="margin-bottom:1.5rem;">
@@ -2269,6 +2415,8 @@
     <button class="admin-btn" onclick="adminSkip()">⏭ Skip Next</button>
     <button class="admin-btn danger" onclick="adminClear()">🗑 Clear Queue</button>
     <button class="admin-btn danger" onclick="adminReset()">↻ Reset All Songs</button>
+    <button class="admin-btn" onclick="djMarkPlayed()">🎧 ✓ Next DJ Req</button>
+    <button class="admin-btn danger" onclick="djClear()">🎧 🗑 Clear DJ Queue</button>
   </div>
 
   <script>
@@ -2890,6 +3038,7 @@
       if (adminTaps >= 3) {
         adminMode = !adminMode;
         document.getElementById('admin-bar').classList.toggle('active', adminMode);
+        updateDJVisibility();
         showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
         adminTaps = 0;
       }
@@ -2900,6 +3049,7 @@
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
         adminMode = !adminMode;
         document.getElementById('admin-bar').classList.toggle('active', adminMode);
+        updateDJVisibility();
         showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
       }
     });
@@ -2938,6 +3088,8 @@
         switchTab('dates');
       } else if (hash === '#contact') {
         switchTab('contact');
+      } else if (hash === '#dj' && document.body.classList.contains('dj-live')) {
+        switchTab('dj');
       }
     }
 
@@ -3013,6 +3165,205 @@
       }
     }
 
+    // ─── DJ REQUEST LINE (gig-time only) ───
+    // The Dates gig cards are the single source of truth: each card's
+    // data-date + "H:MM AM - H:MM PM" time text defines a gig window.
+    // The DJ tab exists from 60 min before downbeat to 30 min after
+    // the listed end. Admin mode or ?djtest in the URL forces it on.
+    const DJ_STATE_KEY = 'jrp_dj_queue_v1';
+    const DJ_CLEAR_KEY = 'jrp_dj_last_clear';
+    const DJ_PRE_MS = 60 * 60000;
+    const DJ_POST_MS = 30 * 60000;
+
+    function loadDJState() {
+      try {
+        const saved = localStorage.getItem(DJ_STATE_KEY);
+        return saved ? JSON.parse(saved) : { queue: [] };
+      } catch (e) { return { queue: [] }; }
+    }
+    let djState = loadDJState();
+    function saveDJState() { localStorage.setItem(DJ_STATE_KEY, JSON.stringify(djState)); }
+
+    function djDailyClear() {
+      const today = new Date().toDateString();
+      if (localStorage.getItem(DJ_CLEAR_KEY) !== today) {
+        djState = { queue: [] };
+        saveDJState();
+        localStorage.setItem(DJ_CLEAR_KEY, today);
+      }
+    }
+
+    function parseGigWindows() {
+      const wins = [];
+      document.querySelectorAll('.gig-card[data-date]').forEach(card => {
+        const timeEl = card.querySelector('.gig-time');
+        if (!timeEl || !card.dataset.date) return;
+        const m = timeEl.textContent.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*[-–—]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+        if (!m) return;
+        const to24 = (h, ap) => (h % 12) + (/pm/i.test(ap) ? 12 : 0);
+        const [y, mo, d] = card.dataset.date.split('-').map(Number);
+        const start = new Date(y, mo - 1, d, to24(+m[1], m[3]), +m[2]);
+        const end = new Date(y, mo - 1, d, to24(+m[4], m[6]), +m[5]);
+        if (end <= start) end.setDate(end.getDate() + 1); // 9 PM - 1 AM sets
+        wins.push({ start: start.getTime(), end: end.getTime() });
+      });
+      return wins;
+    }
+
+    function updateDJVisibility() {
+      const forced = adminMode || new URLSearchParams(location.search).has('djtest');
+      const now = Date.now();
+      const live = parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end + DJ_POST_MS);
+      const show = forced || live;
+      document.body.classList.toggle('dj-live', show);
+      if (!show && document.getElementById('panel-dj').classList.contains('active')) {
+        switchTab('songs');
+      }
+    }
+
+    function djKey(song, artist) {
+      return ((artist || '') + '::' + song).toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    // Build an element with classes/text safely (no HTML parsing)
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    function renderDJQueue() {
+      const listEl = document.getElementById('dj-queue-list');
+      const countEl = document.getElementById('dj-queue-count');
+      listEl.replaceChildren();
+      if (djState.queue.length === 0) {
+        listEl.appendChild(el('div', 'queue-empty', 'Booth is open — drop the first request! 🎧'));
+        countEl.textContent = '0 songs';
+        return;
+      }
+      countEl.textContent = `${djState.queue.length} song${djState.queue.length !== 1 ? 's' : ''}`;
+      const wrap = el('div', 'queue-list');
+      djState.queue.forEach((item, i) => {
+        const row = el('div', 'queue-item');
+        row.appendChild(el('span', 'queue-number', String(i + 1)));
+        const info = el('div', 'queue-song-info');
+        info.appendChild(el('div', 'queue-song-name', item.song));
+        if (item.artist) info.appendChild(el('div', 'queue-song-artist', item.artist));
+        row.appendChild(info);
+        if (item.requester) row.appendChild(el('span', 'queue-requester', 'Requested by ' + item.requester));
+        wrap.appendChild(row);
+      });
+      listEl.appendChild(wrap);
+    }
+
+    function submitDJRequest() {
+      const clean = (id, max) => document.getElementById(id).value.trim().replace(/[<>"'&]/g, '').slice(0, max);
+      const song = clean('dj-song', 60);
+      const artist = clean('dj-artist', 60);
+      const name = clean('dj-name', 30);
+      if (!song) {
+        showToast('Type a song title first! 🎧');
+        document.getElementById('dj-song').focus();
+        return;
+      }
+      const key = djKey(song, artist);
+      if (djState.queue.some(q => q.key === key)) {
+        showToast('That one is already in the DJ queue!');
+        return;
+      }
+      djState.queue.push({ key, song, artist: artist || null, requester: name || null, timestamp: Date.now() });
+      saveDJState();
+      renderDJQueue();
+      const items = document.querySelectorAll('#dj-queue-list .queue-item');
+      if (items.length) items[items.length - 1].classList.add('just-added');
+      ['dj-song', 'dj-artist', 'dj-name'].forEach(id => document.getElementById(id).value = '');
+      hideQuickpick();
+      sendDJAlert(song, artist, name);
+      showToast(`🎧 "${song}" sent to the booth!`);
+    }
+
+    function sendDJAlert(song, artist, name) {
+      try {
+        fetch(ALERT_ENDPOINT, {
+          method: 'POST',
+          keepalive: true,
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            _subject: `🎧 DJ Request: ${song}${artist ? ' — ' + artist : ''}`,
+            _template: 'table',
+            _captcha: 'false',
+            Type: 'DJ Request (open format)',
+            Song: song,
+            Artist: artist || '(not given)',
+            'Requested by': name || 'Anonymous',
+            Time: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }) + ' (CT)'
+          })
+        }).catch(() => {});
+      } catch (e) { /* queue still works without email */ }
+    }
+
+    function djMarkPlayed() {
+      if (djState.queue.length === 0) return;
+      const item = djState.queue.shift();
+      saveDJState();
+      renderDJQueue();
+      showToast(`✓ DJ req "${item.song}" done`);
+    }
+
+    function djClear() {
+      if (!confirm('Clear the DJ queue?')) return;
+      djState.queue = [];
+      saveDJState();
+      renderDJQueue();
+      showToast('🗑 DJ queue cleared');
+    }
+
+    // Quick-pick: live-filter the catalog as the song title is typed
+    const djQuickpickEl = document.getElementById('dj-quickpick');
+    function hideQuickpick() { djQuickpickEl.classList.remove('open'); }
+
+    document.getElementById('dj-song').addEventListener('input', (e) => {
+      const term = e.target.value.trim().toLowerCase();
+      if (term.length < 2) { hideQuickpick(); return; }
+      const hits = SONGS.filter(([a, t]) =>
+        t.toLowerCase().includes(term) || a.toLowerCase().includes(term)
+      ).slice(0, 6);
+      if (!hits.length) { hideQuickpick(); return; }
+      djQuickpickEl.replaceChildren();
+      hits.forEach(([artist, title]) => {
+        const row = el('div', 'dj-quickpick-item');
+        row.dataset.artist = artist;
+        row.dataset.title = title;
+        row.appendChild(el('span', 'qp-title', title));
+        row.appendChild(el('span', 'qp-artist', artist));
+        djQuickpickEl.appendChild(row);
+      });
+      djQuickpickEl.classList.add('open');
+    });
+
+    djQuickpickEl.addEventListener('click', (e) => {
+      const item = e.target.closest('.dj-quickpick-item');
+      if (!item) return;
+      document.getElementById('dj-song').value = item.dataset.title;
+      document.getElementById('dj-artist').value = item.dataset.artist;
+      hideQuickpick();
+      document.getElementById('dj-name').focus();
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dj-field-wrap')) hideQuickpick();
+    });
+
+    document.getElementById('dj-submit').addEventListener('click', submitDJRequest);
+    document.getElementById('dj-name').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitDJRequest();
+    });
+
+    setInterval(updateDJVisibility, 30000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) updateDJVisibility();
+    });
+
     // ─── SCROLL REVEAL ───
     // Staggered rise-in for gig cards & sections as they enter the
     // viewport. Gated on body.js-anim: if this never runs, the CSS
@@ -3042,15 +3393,23 @@
     setupGigDates();
     renderSongs();
     renderQueue();
+    djDailyClear();
+    renderDJQueue();
+    updateDJVisibility();
     handleHash();
 
-    // Refresh queue every 5 seconds (for multi-tab sync)
+    // Refresh queues every 5 seconds (for multi-tab sync)
     setInterval(() => {
       const fresh = loadState();
       if (JSON.stringify(fresh) !== JSON.stringify(state)) {
         state = fresh;
         renderSongs();
         renderQueue();
+      }
+      const freshDJ = loadDJState();
+      if (JSON.stringify(freshDJ) !== JSON.stringify(djState)) {
+        djState = freshDJ;
+        renderDJQueue();
       }
     }, 5000);
   </script>
