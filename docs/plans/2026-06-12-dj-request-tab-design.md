@@ -25,3 +25,19 @@ A fourth main tab, "🎧 DJ Request", that exists only during scheduled gig wind
 ## Out of scope (YAGNI)
 - No server-side shared queue (consistent with existing architecture).
 - No per-song "played" badges for freeform requests (admin just advances the queue).
+
+---
+
+## Post-design evolution (same day)
+
+The tab evolved into **Song Requests** with a dedication form, backed by a
+Cloudflare Worker + D1 (`worker/`): shared band-only queue at
+`/admin?key=…`, per-request email alerts, auto-reset at gig start − 30 min
+and gig end + 30 min (cron parses the live Dates cards every 5 min), and a
+permanent History view with day grouping, CT timestamps, status badges,
+and per-row permanent delete (`POST /api/delete`).
+
+Dashboard bugfix worth remembering: the `hidden` attribute's UA
+`display: none` loses to author `display: flex` — the dashboard now has
+`[hidden] { display: none !important; }` so view toggling actually hides
+the inactive list.

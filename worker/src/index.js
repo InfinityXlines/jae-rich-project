@@ -199,6 +199,17 @@ export default {
       return json({ ok: true });
     }
 
+    // Permanent single-row delete (band-initiated, from the History view)
+    if (url.pathname === '/api/delete' && req.method === 'POST') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      let body;
+      try { body = await req.json(); } catch { return json({ error: 'bad json' }, 400); }
+      const id = Number(body.id);
+      if (!Number.isInteger(id)) return json({ error: 'bad id' }, 400);
+      await env.DB.prepare('DELETE FROM requests WHERE id = ?').bind(id).run();
+      return json({ ok: true });
+    }
+
     if (url.pathname === '/api/reset-check' && req.method === 'POST') {
       if (!authed) return new Response('Not found', { status: 404 });
       const windows = await getGigWindows(env, { forceFresh: true });
@@ -225,6 +236,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
     --purple: #7c5cbf; --border: rgba(212,165,116,0.18); --success: #5cb87a;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* The hidden attribute must always win, even over display:flex below */
+  [hidden] { display: none !important; }
   body {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg); color: #fff; min-height: 100vh; padding: 1.25rem;
@@ -279,6 +292,14 @@ const ADMIN_HTML = `<!DOCTYPE html>
     padding: 0.7rem 1.1rem; cursor: pointer; flex-shrink: 0; transition: transform 0.15s ease;
   }
   button.done:active { transform: scale(0.94); }
+  button.del {
+    background: none; color: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.18); border-radius: 50px;
+    font-size: 0.85rem; font-weight: 700; padding: 0.55rem 0.9rem;
+    cursor: pointer; flex-shrink: 0; transition: all 0.15s ease;
+  }
+  button.del:hover { color: #ff6b61; border-color: rgba(255,59,48,0.5); }
+  button.del:active { transform: scale(0.94); }
   .empty { text-align: center; color: rgba(255,255,255,0.55); padding: 3rem 1rem; font-style: italic;
     max-width: 720px; margin: 0 auto; }
   .day-head { font-size: 0.9rem; color: var(--gold); font-weight: 800; letter-spacing: 0.08em;
@@ -356,6 +377,19 @@ const ADMIN_HTML = `<!DOCTYPE html>
     loadLive();
   }
 
+  async function deleteReq(id, card, song) {
+    if (!confirm('Delete "' + song + '" from history forever? This cannot be undone.')) return;
+    card.style.opacity = '0.35';
+    try {
+      await fetch('/api/delete?key=' + encodeURIComponent(KEY), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+    } catch (e) { card.style.opacity = '1'; return; }
+    loadHistory();
+  }
+
   function renderLive(queue) {
     listEl.replaceChildren();
     emptyEl.hidden = queue.length > 0;
@@ -398,6 +432,9 @@ const ADMIN_HTML = `<!DOCTYPE html>
       meta.appendChild(el('span', 'badge ' + status[0], status[1]));
       body.appendChild(meta);
       card.appendChild(body);
+      const del = el('button', 'del', '🗑 Delete');
+      del.addEventListener('click', () => deleteReq(r.id, card, r.song));
+      card.appendChild(del);
       histEl.appendChild(card);
     });
   }
