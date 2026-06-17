@@ -405,7 +405,7 @@
       font-weight: 600;
     }
 
-    /* ─── Song List inside tab ─── */
+    /* ─── Catalog styles retained for future public browsing ─── */
     .song-list-header {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -477,7 +477,7 @@
     .search-input::placeholder { color: var(--text-muted); }
     .search-input:focus { border-color: var(--gold); }
 
-    /* ─── Song List ─── */
+    /* ─── Catalog list styles ─── */
     .song-count {
       text-align: center;
       font-size: 1rem;
@@ -1599,10 +1599,6 @@
       <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Dates
     </a>
-    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('songs')">
-      <svg viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
-      Song List
-    </a>
     <a href="javascript:void(0)" class="nav-link" onclick="switchTab('contact')">
       <svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
       Contact
@@ -1634,10 +1630,6 @@
       <button class="main-tab active" id="tab-dates" onclick="switchTab('dates')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         Dates
-      </button>
-      <button class="main-tab" id="tab-songs" onclick="switchTab('songs')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
-        Song List
       </button>
       <button class="main-tab" id="tab-dj" onclick="switchTab('dj')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3m18 5a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3"/></svg>
@@ -2505,36 +2497,6 @@
       </div>
     </div>
 
-    <!-- ─── SONGS PANEL ─── -->
-    <div class="tab-panel" id="panel-songs">
-      <div class="song-list-header">
-        <p>286 songs and counting — every one of these is in our hands and voices. Browse the catalog!</p>
-      </div>
-
-      <!-- Genre Filters -->
-      <div class="tabs" id="genre-tabs">
-        <button class="tab-btn active" data-genre="all">All</button>
-        <button class="tab-btn" data-genre="Rock">Rock</button>
-        <button class="tab-btn" data-genre="Soul/R&B">Soul/R&B</button>
-        <button class="tab-btn" data-genre="Pop">Pop</button>
-        <button class="tab-btn" data-genre="Funk">Funk</button>
-        <button class="tab-btn" data-genre="Country">Country</button>
-        <button class="tab-btn" data-genre="Modern">Modern</button>
-      </div>
-
-      <!-- Search -->
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" class="search-input" id="search" placeholder="Search by artist or song...">
-      </div>
-
-      <div class="song-count" id="song-count"></div>
-
-      <!-- Song List -->
-      <div class="song-list" id="song-list"></div>
-    </div>
-
-    <!-- ─── CONTACT PANEL ─── -->
     <!-- ─── DJ / DEDICATIONS PANEL (gig-time only) ─── -->
     <div class="tab-panel" id="panel-dj">
       <div style="text-align:center; margin-bottom:0.5rem;">
@@ -2631,6 +2593,10 @@
 
     // ─── TAB SWITCHING ───
     function switchTab(tab) {
+      const tabButton = document.getElementById('tab-' + tab);
+      const panel = document.getElementById('panel-' + tab);
+      if (!tabButton || !panel) tab = 'dates';
+
       // Update tab buttons
       document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
@@ -2979,6 +2945,7 @@
     function renderSongs() {
       const list = document.getElementById('song-list');
       const countEl = document.getElementById('song-count');
+      if (!list || !countEl) return;
 
       const filtered = SONGS.filter(([artist, title, genre]) => {
         if (currentFilter !== 'all' && genre !== currentFilter) return false;
@@ -3018,10 +2985,13 @@
     }
 
     // ─── EVENT LISTENERS ───
-    document.getElementById('search').addEventListener('input', (e) => {
-      searchTerm = e.target.value;
-      renderSongs();
-    });
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderSongs();
+      });
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -3085,7 +3055,8 @@
     function handleHash() {
       const hash = window.location.hash;
       if (hash === '#songs') {
-        switchTab('songs');
+        history.replaceState(null, '', '#dates');
+        switchTab('dates');
       } else if (hash === '#dates') {
         switchTab('dates');
       } else if (hash === '#contact') {
@@ -3202,7 +3173,7 @@
       const show = forced || live;
       document.body.classList.toggle('dj-live', show);
       if (!show && document.getElementById('panel-dj').classList.contains('active')) {
-        switchTab('songs');
+        switchTab('dates');
       }
     }
 

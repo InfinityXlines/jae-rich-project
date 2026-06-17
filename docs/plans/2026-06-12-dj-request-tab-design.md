@@ -7,7 +7,7 @@ A fourth main tab, "🎧 DJ Request", that exists only during scheduled gig wind
 - Window: visible from **60 min before start** to **30 min after end**. Cross-midnight sets handled (end < start ⇒ end +1 day). Device-local time is correct because the audience is physically at the gig.
 - Re-evaluated every 30 s, on page focus, and at init. `body.dj-live` class gates tab + panel.
 - Overrides: admin mode ON or `?djtest=1` query param forces visibility (band demo/testing).
-- If the window closes while a fan is viewing the DJ panel, they are switched to Song List.
+- If the window closes while a fan is viewing the DJ panel, they are switched to Dates.
 
 ## Request flow (freeform + quick-pick)
 - Inputs: song title (required), artist (optional), name (optional). Sanitized like existing inputs; length-capped.
@@ -20,7 +20,7 @@ A fourth main tab, "🎧 DJ Request", that exists only during scheduled gig wind
 - Admin bar gains: ✓ Next DJ Req / ⏭ Skip DJ / 🗑 Clear DJ Queue.
 
 ## Email alerts
-- Each DJ request POSTs to the same activated FormSubmit form (same domain ⇒ no re-activation), subject `🎧 DJ Request: <song> — <artist>` to distinguish from Song List's 🎵 alerts.
+- Each DJ request POSTs to the same activated FormSubmit form (same domain ⇒ no re-activation), subject `🎧 DJ Request: <song> — <artist>`.
 
 ## Out of scope (YAGNI)
 - No server-side shared queue (consistent with existing architecture).
