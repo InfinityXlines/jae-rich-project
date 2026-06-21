@@ -3063,8 +3063,13 @@
     function handleHash() {
       const hash = window.location.hash;
       if (hash === '#songs') {
-        history.replaceState(null, '', '#dates');
-        switchTab('dates');
+        if (document.body.classList.contains('dj-live')) {
+          history.replaceState(null, '', '#dj');
+          switchTab('dj');
+        } else {
+          history.replaceState(null, '', '#dates');
+          switchTab('dates');
+        }
       } else if (hash === '#dates') {
         switchTab('dates');
       } else if (hash === '#contact') {
@@ -3156,6 +3161,9 @@
     const QUEUE_API = 'https://jrp-live-queue.jrichproject.workers.dev/api/requests';
     const DJ_PRE_MS = 60 * 60000;
     const DJ_POST_MS = 30 * 60000;
+    const DJ_EXTRA_WINDOWS = [
+      { start: new Date(2026, 5, 20, 18, 0).getTime(), end: new Date(2026, 5, 20, 22, 30).getTime() }
+    ];
 
     function parseGigWindows() {
       const wins = [];
@@ -3171,7 +3179,7 @@
         if (end <= start) end.setDate(end.getDate() + 1); // 9 PM - 1 AM sets
         wins.push({ start: start.getTime(), end: end.getTime() });
       });
-      return wins;
+      return wins.concat(DJ_EXTRA_WINDOWS);
     }
 
     function updateDJVisibility() {
