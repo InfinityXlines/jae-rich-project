@@ -18,3 +18,9 @@
 - Parsed the browser script with Node via `new Function(...)`.
 - Rendered the page with Playwright screenshots at desktop and mobile widths.
 - Ran a Playwright interaction check: loaded `#dates`, expanded `46 more dates`, verified July 2 and August 30 render, then scrolled to August 30 and confirmed the private 6:00 PM - 10:00 PM card was visible with opacity `1.0` and no page errors.
+
+## Deployment Note
+
+- Pushed the schedule commit to `dedications-band-queue`, `dj-request-live-tab`, and `fable-stage-motion` because the live site did not refresh from the first two likely source branches.
+- Production `https://jaerichent.com/` still served the pre-update schedule after those pushes: 105 cards, zero July/August cards, last date `2026-06-30`.
+- Direct Cloudflare Pages deploy was blocked because Wrangler requires a `CLOUDFLARE_API_TOKEN` with Pages permissions; the available token returned Cloudflare authentication error `10000` for `/accounts/62cc4dfc95a5fc8e89c1835ff8966bef/pages/projects`.
