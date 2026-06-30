@@ -405,7 +405,7 @@
       font-weight: 600;
     }
 
-    /* ─── Song List inside tab ─── */
+    /* ─── Catalog styles retained for future public browsing ─── */
     .song-list-header {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -477,7 +477,7 @@
     .search-input::placeholder { color: var(--text-muted); }
     .search-input:focus { border-color: var(--gold); }
 
-    /* ─── Song List ─── */
+    /* ─── Catalog list styles ─── */
     .song-count {
       text-align: center;
       font-size: 1rem;
@@ -1134,6 +1134,8 @@
       transform: translateX(6px);
       box-shadow: -4px 0 18px rgba(212, 165, 116, 0.18);
     }
+    /* Song list is a browse-only showcase now */
+    .song-item { cursor: default; }
 
     /* ─── Scroll reveal (gated on body.js-anim so content
            is never hidden if JS fails to run) ─── */
@@ -1217,6 +1219,129 @@
 
     /* ─── Toast: springy entrance ─── */
     .toast { transition: transform 0.55s var(--ease-spring); }
+
+    /* ─── Grand entrance: stage-curtain intro ───
+       Shown once per session on a clean visit (no deep-link hash).
+       Pure CSS timeline with `forwards` fills — even if JS dies the
+       curtains still open and the overlay releases pointer events. */
+    #intro { display: none; }
+    html.with-intro #intro {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      pointer-events: none;
+    }
+    .intro-half {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 50.5%;
+      background: #060609;
+    }
+    .intro-half.top { top: 0; animation: curtainUp 0.8s cubic-bezier(0.7, 0, 0.3, 1) 1.15s forwards; }
+    .intro-half.bottom { bottom: 0; animation: curtainDown 0.8s cubic-bezier(0.7, 0, 0.3, 1) 1.15s forwards; }
+    @keyframes curtainUp { to { transform: translateY(-101%); } }
+    @keyframes curtainDown { to { transform: translateY(101%); } }
+    .intro-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .intro-eq {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+      height: 34px;
+      animation: introEqOut 0.35s ease 0.78s forwards;
+    }
+    .intro-eq span {
+      width: 6px;
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--gold-light), var(--amber));
+      transform-origin: bottom;
+      animation: introEqPulse 0.42s ease-in-out 3 alternate;
+    }
+    .intro-eq span:nth-child(1) { animation-delay: 0.05s; }
+    .intro-eq span:nth-child(2) { animation-delay: 0.18s; }
+    .intro-eq span:nth-child(3) { animation-delay: 0.31s; }
+    @keyframes introEqPulse {
+      from { transform: scaleY(0.15); }
+      to   { transform: scaleY(1); }
+    }
+    @keyframes introEqOut {
+      to { opacity: 0; transform: scale(0.6); }
+    }
+    .intro-line {
+      position: absolute;
+      height: 1px;
+      width: min(420px, 70vw);
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      animation: introLineIn 0.4s var(--ease-out-expo) 0.95s forwards,
+                 introLineOut 0.5s ease 1.45s forwards;
+    }
+    @keyframes introLineIn { to { transform: scaleX(1); } }
+    @keyframes introLineOut { to { opacity: 0; } }
+
+    /* Hold the hero entrance until the curtains part */
+    html.with-intro .hero-logo { animation-delay: 1.45s; }
+    html.with-intro .hero h1 { animation-delay: 1.7s, 2.9s; }
+    html.with-intro .hero-about { animation-delay: 1.95s; }
+    html.with-intro .scroll-indicator { animation-delay: 0s, 2.55s; }
+
+    /* ─── Glassy ambience ─── */
+    /* Edge light: the 1px catch of light along the top of glass */
+    .gig-card, .tab-panel, .queue-section, .song-item, .dj-input, .main-tab {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    }
+    .gig-card { position: relative; overflow: hidden; }
+    .gig-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -70%;
+      width: 55%;
+      background: linear-gradient(105deg,
+        transparent 0%, rgba(255, 255, 255, 0.05) 38%,
+        rgba(255, 255, 255, 0.13) 50%,
+        rgba(255, 255, 255, 0.05) 62%, transparent 100%);
+      transform: skewX(-14deg);
+      pointer-events: none;
+      opacity: 0;
+    }
+    .gig-card.shining::after {
+      opacity: 1;
+      animation: shineSweep 1.2s ease forwards;
+    }
+    @keyframes shineSweep {
+      to { transform: skewX(-14deg) translateX(320%); }
+    }
+
+    /* Drifting gold music notes (hero & gaps only — behind panels) */
+    .float-note {
+      position: fixed;
+      bottom: -3rem;
+      z-index: 0;
+      color: var(--gold);
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      animation: noteRise linear forwards;
+    }
+    @keyframes noteRise {
+      0%   { transform: translateY(0) translateX(0) rotate(-8deg); opacity: 0; }
+      12%  { opacity: 0.28; }
+      45%  { transform: translateY(-45vh) translateX(2.2rem) rotate(10deg); }
+      80%  { opacity: 0.18; }
+      100% { transform: translateY(-108vh) translateX(-1.5rem) rotate(-6deg); opacity: 0; }
+    }
 
     /* ─── DJ Request: gig-time-only tab ─── */
     #tab-dj { display: none; }
@@ -1332,6 +1457,81 @@
     .dj-quickpick-item .qp-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .dj-field-wrap { position: relative; }
 
+    /* ─── Dedication section ─── */
+    .ded-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1rem;
+      background: var(--purple-soft);
+      border: 1px dashed rgba(124, 92, 191, 0.6);
+      border-radius: var(--radius-sm);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out-expo);
+    }
+    .ded-toggle:hover { border-color: var(--purple); background: rgba(124, 92, 191, 0.25); }
+    .ded-toggle:active { transform: scale(0.97); }
+    .ded-toggle svg { width: 18px; height: 18px; transition: transform 0.3s var(--ease-out-expo); }
+    .ded-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .ded-toggle[aria-expanded="true"] { border-style: solid; border-color: var(--purple); }
+    .ded-toggle-hint { font-weight: 400; opacity: 0.65; font-size: 0.9rem; }
+    .ded-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      animation: panelIn 0.4s var(--ease-out-expo);
+    }
+    .ded-chips {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ded-chip {
+      padding: 0.6rem 1.1rem;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-out-expo);
+    }
+    .ded-chip:active { transform: scale(0.94); }
+    .ded-chip.selected {
+      background: linear-gradient(135deg, var(--gold), var(--amber));
+      color: #000;
+      border-color: var(--gold);
+      box-shadow: 0 4px 16px var(--gold-glow);
+    }
+    .dj-success {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      border: 1px solid var(--gold);
+      border-radius: var(--radius);
+      background: rgba(212, 165, 116, 0.08);
+      animation: modalPop 0.5s var(--ease-spring);
+    }
+    .dj-success-icon { font-size: 2.2rem; display: inline-block; animation: micBob 1.6s ease-in-out infinite; }
+    @keyframes micBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .dj-success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin: 0.5rem 0 0.25rem;
+    }
+    .dj-success-text { color: var(--cream-soft); font-size: 0.95rem; }
+
     /* ─── Accessibility: respect reduced motion ─── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1347,8 +1547,33 @@
       }
     }
   </style>
+  <script>
+    // Decide on the grand-entrance intro BEFORE first paint:
+    // once per session, clean visits only (QR deep-links skip it),
+    // and never for reduced-motion users.
+    (function () {
+      try {
+        if (!location.hash &&
+            !sessionStorage.getItem('jrp_intro_seen') &&
+            !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('with-intro');
+          sessionStorage.setItem('jrp_intro_seen', '1');
+        }
+      } catch (e) { /* storage blocked: just skip the intro */ }
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- ═══ GRAND ENTRANCE (once per session) ═══ -->
+  <div id="intro" aria-hidden="true">
+    <div class="intro-half top"></div>
+    <div class="intro-half bottom"></div>
+    <div class="intro-center">
+      <div class="intro-eq"><span></span><span></span><span></span></div>
+      <div class="intro-line"></div>
+    </div>
+  </div>
 
   <!-- Ambient Background -->
   <div class="ambient">
@@ -1373,10 +1598,6 @@
     <a href="javascript:void(0)" class="nav-link" onclick="switchTab('dates')">
       <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Dates
-    </a>
-    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('songs')">
-      <svg viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
-      Song List
     </a>
     <a href="javascript:void(0)" class="nav-link" onclick="switchTab('contact')">
       <svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -1410,13 +1631,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         Dates
       </button>
-      <button class="main-tab" id="tab-songs" onclick="switchTab('songs')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19V6l12-3v13M9 19c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2zm12-3c0 1.1-1.3 2-3 2s-3-.9-3-2 1.3-2 3-2 3 .9 3 2z"/></svg>
-        Song List
-      </button>
       <button class="main-tab" id="tab-dj" onclick="switchTab('dj')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3m18 5a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3"/></svg>
-        DJ Request
+        Song Requests
         <span class="onair-dot"></span>
       </button>
       <button class="main-tab" id="tab-contact" onclick="switchTab('contact')">
@@ -2204,6 +2421,14 @@
             <div class="gig-time">6:30 PM - 9:30 PM</div>
           </div>
         </div>
+        <div class="gig-card" data-date="2026-06-20">
+          <div class="gig-date"><div class="month">Jun</div><div class="day">20</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Windjammers</div>
+            <div class="gig-details">Public • Navarre, FL</div>
+            <div class="gig-time">6:00 PM - 10:00 PM</div>
+          </div>
+        </div>
         <div class="gig-card" data-date="2026-06-21">
           <div class="gig-date"><div class="month">Jun</div><div class="day">21</div></div>
           <div class="gig-info">
@@ -2276,74 +2501,416 @@
             <div class="gig-time">6:30 PM - 9:30 PM</div>
           </div>
         </div>
+        <!-- ─── JULY 2026 ─── -->
+        <div class="gig-card" data-date="2026-07-02">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">2</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-03">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">3</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-04">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">4</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:00 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-05">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">5</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-07">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">7</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-09">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">9</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-10">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">10</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-11">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">11</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-12">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">12</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-14">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">14</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-15">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">15</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-16">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">16</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-17">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">17</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-18">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">18</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-21">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">21</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-22">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">22</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-23">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">23</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-24">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">24</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-26">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">26</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Private Event • Miramar Beach</div>
+            <div class="gig-time">12:00 PM - 2:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-27">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">27</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-28">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">28</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-30">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">30</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-07-31">
+          <div class="gig-date"><div class="month">Jul</div><div class="day">31</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <!-- ─── AUGUST 2026 ─── -->
+        <div class="gig-card" data-date="2026-08-01">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">1</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-02">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">2</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-03">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">3</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-04">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">4</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-06">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">6</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-09">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">9</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-10">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">10</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-11">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">11</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-13">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">13</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-14">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">14</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-15">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">15</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Private Event • Miramar Beach</div>
+            <div class="gig-time">7:00 PM - 10:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-16">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">16</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-18">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">18</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-20">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">20</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-21">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">21</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-22" data-order="1">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">22</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Private Event • Miramar Beach</div>
+            <div class="gig-time">10:00 AM - 1:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-22" data-order="2">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">22</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-23">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">23</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-25">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">25</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-27">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">27</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-28">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">28</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-29">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">29</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Public • Miramar Beach</div>
+            <div class="gig-time">6:30 PM - 9:30 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-30">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">30</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">Sunquest Solaris</div>
+            <div class="gig-details">Private Event • Miramar Beach</div>
+            <div class="gig-time">6:00 PM - 10:00 PM</div>
+          </div>
+        </div>
         <div class="no-gigs" id="no-gigs" style="display:none;">No upcoming dates — check back soon! 🎶</div>
       </div>
     </div>
 
-    <!-- ─── SONGS PANEL ─── -->
-    <div class="tab-panel" id="panel-songs">
-      <div class="song-list-header">
-        <p>Tap any song to request it. The playlist builds live as requests come in!</p>
-      </div>
-
-      <!-- Genre Filters -->
-      <div class="tabs" id="genre-tabs">
-        <button class="tab-btn active" data-genre="all">All</button>
-        <button class="tab-btn" data-genre="Rock">Rock</button>
-        <button class="tab-btn" data-genre="Soul/R&B">Soul/R&B</button>
-        <button class="tab-btn" data-genre="Pop">Pop</button>
-        <button class="tab-btn" data-genre="Funk">Funk</button>
-        <button class="tab-btn" data-genre="Country">Country</button>
-        <button class="tab-btn" data-genre="Modern">Modern</button>
-      </div>
-
-      <!-- Search -->
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" class="search-input" id="search" placeholder="Search by artist or song...">
-      </div>
-
-      <div class="song-count" id="song-count"></div>
-
-      <!-- Song List -->
-      <div class="song-list" id="song-list"></div>
-
-      <!-- Live Queue -->
-      <div class="queue-section" id="queue-section">
-        <div class="queue-header">
-          <h3><span class="queue-live-dot"></span> Live Queue</h3>
-          <span class="queue-count" id="queue-count">0 songs</span>
-        </div>
-        <div id="queue-list">
-          <div class="queue-empty">No requests yet — be the first! 🎵</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── CONTACT PANEL ─── -->
-    <!-- ─── DJ REQUEST PANEL (gig-time only) ─── -->
+    <!-- ─── DJ / DEDICATIONS PANEL (gig-time only) ─── -->
     <div class="tab-panel" id="panel-dj">
       <div style="text-align:center; margin-bottom:0.5rem;">
         <span class="onair-badge"><span class="onair-dot"></span> On Air</span>
-        <h3 style="font-size:1.6rem; color:var(--gold); margin:1rem 0 0.4rem;">DJ Request Line</h3>
-        <p style="color:var(--cream-soft); font-size:1.05rem;">We're live! Request <em>any</em> song — if we can spin it, we will. 🎧</p>
+        <h3 style="font-size:1.6rem; color:var(--gold); margin:1rem 0 0.4rem;">DJ / Dedications</h3>
+        <p style="color:var(--cream-soft); font-size:1.05rem;">We're live! Request <em>any</em> song — and make it personal with a dedication. 🎧</p>
       </div>
-      <div class="dj-form">
+      <div class="dj-form" id="dj-form">
         <div class="dj-field-wrap">
-          <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="60" autocomplete="off">
+          <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="80" autocomplete="off">
           <div class="dj-quickpick" id="dj-quickpick"></div>
         </div>
-        <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="60" autocomplete="off">
-        <input type="text" class="dj-input" id="dj-name" placeholder="Your name (optional)" maxlength="30" autocomplete="off">
-        <button class="dj-submit" id="dj-submit">🎧 Send It to the Booth</button>
-      </div>
-      <div class="queue-section">
-        <div class="queue-header">
-          <h3><span class="queue-live-dot"></span> DJ Live Queue</h3>
-          <span class="queue-count" id="dj-queue-count">0 songs</span>
+        <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="80" autocomplete="off">
+
+        <button type="button" class="ded-toggle" id="ded-toggle" aria-expanded="false">
+          💝 Add a dedication <span class="ded-toggle-hint">(optional)</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+
+        <div class="ded-fields" id="ded-fields" hidden>
+          <div class="ded-chips" id="ded-chips">
+            <button type="button" class="ded-chip" data-occasion="Birthday">🎂 Birthday</button>
+            <button type="button" class="ded-chip" data-occasion="Anniversary">💍 Anniversary</button>
+            <button type="button" class="ded-chip" data-occasion="Special Request">⭐ Special Request</button>
+          </div>
+          <input type="text" class="dj-input" id="ded-years" placeholder="How many years? (optional)" maxlength="10" inputmode="numeric" autocomplete="off" hidden>
+          <input type="text" class="dj-input" id="ded-to" placeholder="Dedication is for… (e.g. Angela)" maxlength="40" autocomplete="off">
+          <input type="text" class="dj-input" id="ded-from" placeholder="From… (your name)" maxlength="40" autocomplete="off">
+          <input type="text" class="dj-input" id="ded-comments" placeholder="Anything we should say? (e.g. Angela's 50th birthday!)" maxlength="200" autocomplete="off">
         </div>
-        <div id="dj-queue-list">
-          <div class="queue-empty">Booth is open — drop the first request! 🎧</div>
+
+        <button class="dj-submit" id="dj-submit">🎧 Send It to the Booth</button>
+        <div class="dj-success" id="dj-success" hidden>
+          <div class="dj-success-icon">🎤</div>
+          <div class="dj-success-title">Request received!</div>
+          <div class="dj-success-text">Listen for your shout-out — we'll work it into the set.</div>
         </div>
       </div>
     </div>
@@ -2394,30 +2961,8 @@
   </footer>
 
   <!-- ═══ REQUEST MODAL ═══ -->
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <h3>Request This Song</h3>
-      <div class="modal-song-info" id="modal-song-info"></div>
-      <input type="text" class="modal-input" id="requester-name" placeholder="Your name (optional)" maxlength="30" autocomplete="off">
-      <div class="modal-actions">
-        <button class="btn-cancel" id="modal-cancel">Cancel</button>
-        <button class="btn-request" id="modal-confirm">🎵 Request It</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ═══ TOAST ═══ -->
   <div class="toast" id="toast"></div>
-
-  <!-- ═══ ADMIN BAR ═══ -->
-  <div class="admin-bar" id="admin-bar">
-    <button class="admin-btn" onclick="adminMarkPlayed()">✓ Mark Next as Played</button>
-    <button class="admin-btn" onclick="adminSkip()">⏭ Skip Next</button>
-    <button class="admin-btn danger" onclick="adminClear()">🗑 Clear Queue</button>
-    <button class="admin-btn danger" onclick="adminReset()">↻ Reset All Songs</button>
-    <button class="admin-btn" onclick="djMarkPlayed()">🎧 ✓ Next DJ Req</button>
-    <button class="admin-btn danger" onclick="djClear()">🎧 🗑 Clear DJ Queue</button>
-  </div>
 
   <script>
     // ═══════════════════════════════════════════════════
@@ -2426,6 +2971,10 @@
 
     // ─── TAB SWITCHING ───
     function switchTab(tab) {
+      const tabButton = document.getElementById('tab-' + tab);
+      const panel = document.getElementById('panel-' + tab);
+      if (!tabButton || !panel) tab = 'dates';
+
       // Update tab buttons
       document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
@@ -2757,62 +3306,26 @@
       ["Young The Giant", "Cough Syrup", "Rock"],
     ];
 
-    // ─── STATE ───
-    const STATE_KEY = 'jaerich_state';
-    const LAST_CLEAR_KEY = 'jaerich_last_clear';
-    let state = loadState();
-
-    // ─── DAILY AUTO-CLEAR ───
-    function checkDailyClear() {
-      const today = new Date().toDateString();
-      const lastClear = localStorage.getItem(LAST_CLEAR_KEY);
-      if (lastClear !== today) {
-        state = { queue: [], played: [] };
-        saveState();
-        localStorage.setItem(LAST_CLEAR_KEY, today);
-        console.log('Daily queue reset performed');
-      }
-    }
-    checkDailyClear();
+    // ─── UI STATE ───
     let currentFilter = 'all';
     let searchTerm = '';
-    let selectedSong = null;
     let adminMode = false;
 
-    function loadState() {
-      try {
-        const saved = localStorage.getItem(STATE_KEY);
-        if (saved) return JSON.parse(saved);
-      } catch(e) {}
-      return { queue: [], played: [] };
+    // Build an element with class/text safely (no HTML parsing)
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
     }
 
-    function saveState() {
-      try {
-        localStorage.setItem(STATE_KEY, JSON.stringify(state));
-      } catch(e) {}
-    }
-
-    function getSongKey(artist, title) {
-      return `${artist}|||${title}`;
-    }
-
-    function isSongRequested(artist, title) {
-      const key = getSongKey(artist, title);
-      return state.queue.some(q => q.key === key);
-    }
-
-    function isSongPlayed(artist, title) {
-      const key = getSongKey(artist, title);
-      return state.played.includes(key);
-    }
-
-    // ─── RENDER SONG LIST ───
+    // ─── RENDER SONG LIST (browse-only showcase) ───
     function renderSongs() {
       const list = document.getElementById('song-list');
       const countEl = document.getElementById('song-count');
+      if (!list || !countEl) return;
 
-      let filtered = SONGS.filter(([artist, title, genre]) => {
+      const filtered = SONGS.filter(([artist, title, genre]) => {
         if (currentFilter !== 'all' && genre !== currentFilter) return false;
         if (searchTerm) {
           const term = searchTerm.toLowerCase();
@@ -2821,181 +3334,27 @@
         return true;
       });
 
-      countEl.textContent = `${filtered.length} song${filtered.length !== 1 ? 's' : ''} available`;
+      countEl.textContent = `${filtered.length} song${filtered.length !== 1 ? 's' : ''} in the set`;
 
-      list.innerHTML = filtered.map(([artist, title, genre], i) => {
-        const requested = isSongRequested(artist, title);
-        const played = isSongPlayed(artist, title);
-        const statusClass = played ? 'played' : (requested ? 'requested' : '');
-
-        return `<div class="song-item ${statusClass}" data-artist="${escHtml(artist)}" data-title="${escHtml(title)}" style="animation-delay:${Math.min(i * 0.03, 1)}s">
-          <div class="song-info">
-            <div class="song-artist">${escHtml(artist)}</div>
-            <div class="song-title">${escHtml(title)}</div>
-          </div>
-          <span class="song-genre-badge">${escHtml(genre)}</span>
-        </div>`;
-      }).join('');
-
-      // Attach click handlers
-      list.querySelectorAll('.song-item:not(.requested):not(.played)').forEach(el => {
-        el.addEventListener('click', () => {
-          selectedSong = { artist: el.dataset.artist, title: el.dataset.title };
-          openModal();
-        });
+      list.replaceChildren();
+      filtered.forEach(([artist, title, genre], i) => {
+        const item = el('div', 'song-item');
+        item.style.animationDelay = Math.min(i * 0.03, 1) + 's';
+        const info = el('div', 'song-info');
+        info.appendChild(el('div', 'song-artist', artist));
+        info.appendChild(el('div', 'song-title', title));
+        item.appendChild(info);
+        item.appendChild(el('span', 'song-genre-badge', genre));
+        list.appendChild(item);
       });
-    }
-
-    // ─── RENDER QUEUE ───
-    function renderQueue() {
-      const queueEl = document.getElementById('queue-list');
-      const countEl = document.getElementById('queue-count');
-
-      if (state.queue.length === 0) {
-        queueEl.innerHTML = '<div class="queue-empty">No requests yet — be the first! 🎵</div>';
-        countEl.textContent = '0 songs';
-        return;
-      }
-
-      countEl.textContent = `${state.queue.length} song${state.queue.length !== 1 ? 's' : ''}`;
-
-      queueEl.innerHTML = '<div class="queue-list">' + state.queue.map((item, i) => {
-        return `<div class="queue-item">
-          <span class="queue-number">${i + 1}</span>
-          <div class="queue-song-info">
-            <div class="queue-song-name">${escHtml(item.title)}</div>
-            <div class="queue-song-artist">${escHtml(item.artist)}</div>
-          </div>
-          ${item.requester ? `<span class="queue-requester">Requested by ${escHtml(item.requester)}</span>` : ''}
-        </div>`;
-      }).join('') + '</div>';
-    }
-
-    // ─── MODAL ───
-    function openModal() {
-      if (!selectedSong) return;
-      const modal = document.getElementById('modal');
-      const info = document.getElementById('modal-song-info');
-      const nameInput = document.getElementById('requester-name');
-
-      info.innerHTML = `<strong>${escHtml(selectedSong.artist)}</strong><br>${escHtml(selectedSong.title)}`;
-      nameInput.value = '';
-      modal.classList.add('active');
-      setTimeout(() => nameInput.focus(), 300);
-    }
-
-    function closeModal() {
-      const modal = document.getElementById('modal');
-      selectedSong = null;
-      if (!modal.classList.contains('active') || modal.classList.contains('closing')) return;
-      modal.classList.add('closing');
-      setTimeout(() => modal.classList.remove('active', 'closing'), 240);
-    }
-
-    function submitRequest() {
-      if (!selectedSong) return;
-      const song = selectedSong;
-      const name = document.getElementById('requester-name').value.trim().replace(/[<>"'&]/g, '');
-      const key = getSongKey(song.artist, song.title);
-
-      if (state.queue.some(q => q.key === key) || state.played.includes(key)) {
-        closeModal();
-        showToast('This song has already been requested!');
-        return;
-      }
-
-      state.queue.push({
-        key,
-        artist: song.artist,
-        title: song.title,
-        requester: name || null,
-        timestamp: Date.now()
-      });
-
-      saveState();
-      closeModal();
-      renderSongs();
-      renderQueue();
-
-      // Gold arrival flash on the newest queue item
-      const items = document.querySelectorAll('#queue-list .queue-item');
-      if (items.length) items[items.length - 1].classList.add('just-added');
-
-      sendRequestAlert(song, name);
-      showToast(`🎵 "${song.title}" has been added to the queue!`);
     }
 
     // ─── EMAIL ALERT ───
-    // Fire-and-forget email to the band when a live request comes in.
-    // Uses FormSubmit's AJAX endpoint — no backend or API key needed.
-    // NOTE: the first-ever submission triggers a one-time activation
-    // email to this inbox; the alert flow starts after it's confirmed.
+    // Fire-and-forget email to the band when a request comes in.
+    // Uses FormSubmit's AJAX endpoint — activated for jaerichent.com.
     const ALERT_ENDPOINT = 'https://formsubmit.co/ajax/jrichproject@gmail.com';
 
-    function sendRequestAlert(song, requesterName) {
-      try {
-        fetch(ALERT_ENDPOINT, {
-          method: 'POST',
-          keepalive: true, // survives the fan locking their phone right after tapping
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            _subject: `🎵 Song Request: ${song.title} — ${song.artist}`,
-            _template: 'table',
-            _captcha: 'false',
-            Song: song.title,
-            Artist: song.artist,
-            'Requested by': requesterName || 'Anonymous',
-            Time: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }) + ' (CT)'
-          })
-        }).catch(() => { /* never block the fan's request on email delivery */ });
-      } catch (e) { /* old browsers without fetch: queue still works locally */ }
-    }
-
-    // ─── ADMIN FUNCTIONS ───
-    function adminMarkPlayed() {
-      if (state.queue.length === 0) return;
-      const item = state.queue.shift();
-      state.played.push(item.key);
-      saveState();
-      renderSongs();
-      renderQueue();
-      showToast(`✓ "${item.title}" marked as played`);
-    }
-
-    function adminSkip() {
-      if (state.queue.length === 0) return;
-      const item = state.queue.shift();
-      saveState();
-      renderSongs();
-      renderQueue();
-      showToast(`⏭ "${item.title}" skipped`);
-    }
-
-    function adminClear() {
-      if (!confirm('Clear the entire queue?')) return;
-      state.queue = [];
-      saveState();
-      renderSongs();
-      renderQueue();
-      showToast('🗑 Queue cleared');
-    }
-
-    function adminReset() {
-      if (!confirm('Reset everything? This clears the queue AND played songs.')) return;
-      state = { queue: [], played: [] };
-      saveState();
-      renderSongs();
-      renderQueue();
-      showToast('↻ All songs reset');
-    }
-
     // ─── UTILITIES ───
-    function escHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -3004,20 +3363,13 @@
     }
 
     // ─── EVENT LISTENERS ───
-    document.getElementById('modal-cancel').addEventListener('click', closeModal);
-    document.getElementById('modal-confirm').addEventListener('click', submitRequest);
-    document.getElementById('modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('modal')) closeModal();
-    });
-
-    document.getElementById('requester-name').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitRequest();
-    });
-
-    document.getElementById('search').addEventListener('input', (e) => {
-      searchTerm = e.target.value;
-      renderSongs();
-    });
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderSongs();
+      });
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -3037,9 +3389,8 @@
       adminTimer = setTimeout(() => { adminTaps = 0; }, 1000);
       if (adminTaps >= 3) {
         adminMode = !adminMode;
-        document.getElementById('admin-bar').classList.toggle('active', adminMode);
         updateDJVisibility();
-        showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
+        showToast(adminMode ? '🎧 Band mode ON — DJ tab unlocked' : '🎧 Band mode OFF');
         adminTaps = 0;
       }
     });
@@ -3048,9 +3399,8 @@
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'A') {
         adminMode = !adminMode;
-        document.getElementById('admin-bar').classList.toggle('active', adminMode);
         updateDJVisibility();
-        showToast(adminMode ? '🎛️ Admin mode ON' : '🎛️ Admin mode OFF');
+        showToast(adminMode ? '🎧 Band mode ON — DJ tab unlocked' : '🎧 Band mode OFF');
       }
     });
 
@@ -3083,7 +3433,13 @@
     function handleHash() {
       const hash = window.location.hash;
       if (hash === '#songs') {
-        switchTab('songs');
+        if (document.body.classList.contains('dj-live')) {
+          history.replaceState(null, '', '#dj');
+          switchTab('dj');
+        } else {
+          history.replaceState(null, '', '#dates');
+          switchTab('dates');
+        }
       } else if (hash === '#dates') {
         switchTab('dates');
       } else if (hash === '#contact') {
@@ -3165,33 +3521,19 @@
       }
     }
 
-    // ─── DJ REQUEST LINE (gig-time only) ───
+    // ─── DJ / DEDICATIONS (gig-time only) ───
     // The Dates gig cards are the single source of truth: each card's
     // data-date + "H:MM AM - H:MM PM" time text defines a gig window.
     // The DJ tab exists from 60 min before downbeat to 30 min after
     // the listed end. Admin mode or ?djtest in the URL forces it on.
-    const DJ_STATE_KEY = 'jrp_dj_queue_v1';
-    const DJ_CLEAR_KEY = 'jrp_dj_last_clear';
+    // Requests go to the band-only live queue (Cloudflare Worker + D1)
+    // AND to the email inbox — neither failing blocks the other.
+    const QUEUE_API = 'https://jrp-live-queue.jrichproject.workers.dev/api/requests';
     const DJ_PRE_MS = 60 * 60000;
     const DJ_POST_MS = 30 * 60000;
-
-    function loadDJState() {
-      try {
-        const saved = localStorage.getItem(DJ_STATE_KEY);
-        return saved ? JSON.parse(saved) : { queue: [] };
-      } catch (e) { return { queue: [] }; }
-    }
-    let djState = loadDJState();
-    function saveDJState() { localStorage.setItem(DJ_STATE_KEY, JSON.stringify(djState)); }
-
-    function djDailyClear() {
-      const today = new Date().toDateString();
-      if (localStorage.getItem(DJ_CLEAR_KEY) !== today) {
-        djState = { queue: [] };
-        saveDJState();
-        localStorage.setItem(DJ_CLEAR_KEY, today);
-      }
-    }
+    const DJ_EXTRA_WINDOWS = [
+      { start: new Date(2026, 5, 20, 18, 0).getTime(), end: new Date(2026, 5, 20, 22, 30).getTime() }
+    ];
 
     function parseGigWindows() {
       const wins = [];
@@ -3207,7 +3549,7 @@
         if (end <= start) end.setDate(end.getDate() + 1); // 9 PM - 1 AM sets
         wins.push({ start: start.getTime(), end: end.getTime() });
       });
-      return wins;
+      return wins.concat(DJ_EXTRA_WINDOWS);
     }
 
     function updateDJVisibility() {
@@ -3217,106 +3559,106 @@
       const show = forced || live;
       document.body.classList.toggle('dj-live', show);
       if (!show && document.getElementById('panel-dj').classList.contains('active')) {
-        switchTab('songs');
+        switchTab('dates');
       }
     }
 
-    function djKey(song, artist) {
-      return ((artist || '') + '::' + song).toLowerCase().replace(/\s+/g, ' ').trim();
-    }
+    // ─── Dedication form ───
+    let selectedOccasion = '';
 
-    // Build an element with classes/text safely (no HTML parsing)
-    function el(tag, className, text) {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text) node.textContent = text;
-      return node;
-    }
+    const dedToggle = document.getElementById('ded-toggle');
+    const dedFields = document.getElementById('ded-fields');
+    dedToggle.addEventListener('click', () => {
+      const opening = dedFields.hidden;
+      dedFields.hidden = !opening;
+      dedToggle.setAttribute('aria-expanded', String(opening));
+    });
 
-    function renderDJQueue() {
-      const listEl = document.getElementById('dj-queue-list');
-      const countEl = document.getElementById('dj-queue-count');
-      listEl.replaceChildren();
-      if (djState.queue.length === 0) {
-        listEl.appendChild(el('div', 'queue-empty', 'Booth is open — drop the first request! 🎧'));
-        countEl.textContent = '0 songs';
-        return;
-      }
-      countEl.textContent = `${djState.queue.length} song${djState.queue.length !== 1 ? 's' : ''}`;
-      const wrap = el('div', 'queue-list');
-      djState.queue.forEach((item, i) => {
-        const row = el('div', 'queue-item');
-        row.appendChild(el('span', 'queue-number', String(i + 1)));
-        const info = el('div', 'queue-song-info');
-        info.appendChild(el('div', 'queue-song-name', item.song));
-        if (item.artist) info.appendChild(el('div', 'queue-song-artist', item.artist));
-        row.appendChild(info);
-        if (item.requester) row.appendChild(el('span', 'queue-requester', 'Requested by ' + item.requester));
-        wrap.appendChild(row);
+    document.querySelectorAll('.ded-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasSelected = chip.classList.contains('selected');
+        document.querySelectorAll('.ded-chip').forEach(c => c.classList.remove('selected'));
+        selectedOccasion = wasSelected ? '' : chip.dataset.occasion;
+        if (!wasSelected) chip.classList.add('selected');
+        // Years only makes sense for birthdays & anniversaries
+        const yearsEl = document.getElementById('ded-years');
+        yearsEl.hidden = !(selectedOccasion === 'Birthday' || selectedOccasion === 'Anniversary');
+        if (yearsEl.hidden) yearsEl.value = '';
       });
-      listEl.appendChild(wrap);
+    });
+
+    function resetDedicationForm() {
+      ['dj-song', 'dj-artist', 'ded-years', 'ded-to', 'ded-from', 'ded-comments']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      document.querySelectorAll('.ded-chip').forEach(c => c.classList.remove('selected'));
+      selectedOccasion = '';
+      document.getElementById('ded-years').hidden = true;
+      dedFields.hidden = true;
+      dedToggle.setAttribute('aria-expanded', 'false');
     }
 
-    function submitDJRequest() {
-      const clean = (id, max) => document.getElementById(id).value.trim().replace(/[<>"'&]/g, '').slice(0, max);
-      const song = clean('dj-song', 60);
-      const artist = clean('dj-artist', 60);
-      const name = clean('dj-name', 30);
+    function submitDedication() {
+      // Strip only angle brackets — everything downstream renders via
+      // textContent, and names like "Earth, Wind & Fire" need their &.
+      const val = (id, max) => document.getElementById(id).value.trim().replace(/[<>]/g, '').slice(0, max);
+      const song = val('dj-song', 80);
       if (!song) {
         showToast('Type a song title first! 🎧');
         document.getElementById('dj-song').focus();
         return;
       }
-      const key = djKey(song, artist);
-      if (djState.queue.some(q => q.key === key)) {
-        showToast('That one is already in the DJ queue!');
-        return;
-      }
-      djState.queue.push({ key, song, artist: artist || null, requester: name || null, timestamp: Date.now() });
-      saveDJState();
-      renderDJQueue();
-      const items = document.querySelectorAll('#dj-queue-list .queue-item');
-      if (items.length) items[items.length - 1].classList.add('just-added');
-      ['dj-song', 'dj-artist', 'dj-name'].forEach(id => document.getElementById(id).value = '');
+      const payload = {
+        song,
+        artist: val('dj-artist', 80),
+        occasion: selectedOccasion,
+        years: val('ded-years', 10),
+        to_name: val('ded-to', 40),
+        from_name: val('ded-from', 40),
+        comments: val('ded-comments', 200)
+      };
+
+      // 1) Band live queue (shared backend — every phone feeds one list)
+      try {
+        fetch(QUEUE_API, {
+          method: 'POST',
+          keepalive: true,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      } catch (e) {}
+
+      // 2) Email alert (independent of the queue — belt and suspenders)
+      sendDedicationAlert(payload);
+
+      // 3) Success moment
       hideQuickpick();
-      sendDJAlert(song, artist, name);
-      showToast(`🎧 "${song}" sent to the booth!`);
+      resetDedicationForm();
+      const successEl = document.getElementById('dj-success');
+      successEl.hidden = false;
+      successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { successEl.hidden = true; }, 6500);
     }
 
-    function sendDJAlert(song, artist, name) {
+    function sendDedicationAlert(p) {
       try {
         fetch(ALERT_ENDPOINT, {
           method: 'POST',
           keepalive: true,
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
-            _subject: `🎧 DJ Request: ${song}${artist ? ' — ' + artist : ''}`,
+            _subject: `🎧 ${p.occasion || 'DJ Request'}: ${p.song}${p.artist ? ' — ' + p.artist : ''}`,
             _template: 'table',
             _captcha: 'false',
-            Type: 'DJ Request (open format)',
-            Song: song,
-            Artist: artist || '(not given)',
-            'Requested by': name || 'Anonymous',
+            Song: p.song,
+            Artist: p.artist || '(not given)',
+            Occasion: p.occasion ? p.occasion + (p.years ? ` (${p.years} years)` : '') : '(none)',
+            'Dedication to': p.to_name || '—',
+            'Dedication from': p.from_name || '—',
+            Comments: p.comments || '—',
             Time: new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }) + ' (CT)'
           })
         }).catch(() => {});
-      } catch (e) { /* queue still works without email */ }
-    }
-
-    function djMarkPlayed() {
-      if (djState.queue.length === 0) return;
-      const item = djState.queue.shift();
-      saveDJState();
-      renderDJQueue();
-      showToast(`✓ DJ req "${item.song}" done`);
-    }
-
-    function djClear() {
-      if (!confirm('Clear the DJ queue?')) return;
-      djState.queue = [];
-      saveDJState();
-      renderDJQueue();
-      showToast('🗑 DJ queue cleared');
+      } catch (e) { /* band queue still gets it */ }
     }
 
     // Quick-pick: live-filter the catalog as the song title is typed
@@ -3348,21 +3690,64 @@
       document.getElementById('dj-song').value = item.dataset.title;
       document.getElementById('dj-artist').value = item.dataset.artist;
       hideQuickpick();
-      document.getElementById('dj-name').focus();
     });
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dj-field-wrap')) hideQuickpick();
     });
 
-    document.getElementById('dj-submit').addEventListener('click', submitDJRequest);
-    document.getElementById('dj-name').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitDJRequest();
-    });
+    document.getElementById('dj-submit').addEventListener('click', submitDedication);
 
     setInterval(updateDJVisibility, 30000);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) updateDJVisibility();
     });
+
+    // ─── GRAND ENTRANCE & GLASSY AMBIENCE ───
+    // Intro overlay: the CSS timeline already opened the curtains;
+    // this just removes the dead nodes once the show has started.
+    (function introCleanup() {
+      const intro = document.getElementById('intro');
+      if (!intro) return;
+      if (!document.documentElement.classList.contains('with-intro')) { intro.remove(); return; }
+      setTimeout(() => intro.remove(), 2300);
+    })();
+
+    // Drifting gold music notes — sparse, hero-and-gaps only
+    (function ambientNotes() {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const glyphs = ['♪', '♫', '♩', '♬'];
+      function spawn() {
+        if (document.hidden) return;
+        if (document.querySelectorAll('.float-note').length >= 3) return;
+        const n = document.createElement('span');
+        n.className = 'float-note';
+        n.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        n.style.left = (6 + Math.random() * 86) + 'vw';
+        n.style.fontSize = (0.9 + Math.random() * 0.9) + 'rem';
+        n.style.animationDuration = (9 + Math.random() * 6) + 's';
+        document.body.appendChild(n);
+        n.addEventListener('animationend', () => n.remove());
+      }
+      setTimeout(spawn, 3800);
+      setInterval(spawn, 8000);
+    })();
+
+    // Occasional glossy shine sweep across a visible gig card
+    (function glassShine() {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      function sweep() {
+        if (document.hidden) return;
+        const candidates = [...document.querySelectorAll('.gig-card')].filter(c => {
+          const r = c.getBoundingClientRect();
+          return r.height > 0 && r.top < innerHeight && r.bottom > 0;
+        });
+        if (!candidates.length) return;
+        const card = candidates[Math.floor(Math.random() * candidates.length)];
+        card.classList.add('shining');
+        setTimeout(() => card.classList.remove('shining'), 1300);
+      }
+      setInterval(sweep, 9000);
+    })();
 
     // ─── SCROLL REVEAL ───
     // Staggered rise-in for gig cards & sections as they enter the
@@ -3392,26 +3777,8 @@
     // ─── INIT ───
     setupGigDates();
     renderSongs();
-    renderQueue();
-    djDailyClear();
-    renderDJQueue();
     updateDJVisibility();
     handleHash();
-
-    // Refresh queues every 5 seconds (for multi-tab sync)
-    setInterval(() => {
-      const fresh = loadState();
-      if (JSON.stringify(fresh) !== JSON.stringify(state)) {
-        state = fresh;
-        renderSongs();
-        renderQueue();
-      }
-      const freshDJ = loadDJState();
-      if (JSON.stringify(freshDJ) !== JSON.stringify(djState)) {
-        djState = freshDJ;
-        renderDJQueue();
-      }
-    }, 5000);
   </script>
 </body>
 </html>
