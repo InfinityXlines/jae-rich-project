@@ -150,6 +150,13 @@ function monthNameCT(key) {
   return new Date(Date.UTC(y, m - 1, 15)).toLocaleString('en-US', { month: 'long', year: 'numeric' });
 }
 
+function prevMonthKeyCT() {
+  // Real month arithmetic — "now minus 32 days" overshoots on the 1st
+  const [y, m] = monthKeyCT(Date.now()).split('-').map(Number);
+  const d = new Date(Date.UTC(y, m - 2, 15));
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+}
+
 async function computeStats(env) {
   const { results: rows } = await env.DB.prepare(
     'SELECT song, artist, occasion, created_at FROM requests ORDER BY created_at DESC LIMIT 5000'
@@ -166,9 +173,10 @@ async function computeStats(env) {
     return e;
   };
 
-  const songsAll = new Map(), songsThisMonth = new Map(), learnNext = new Map();
+  const songsAll = new Map(), songsThisMonth = new Map(), songsPrevMonth = new Map(), learnNext = new Map();
   const months = new Map(), occasions = new Map(), venues = new Map(), days = new Map();
   const nowMonth = monthKeyCT(Date.now());
+  const prevMonth = prevMonthKeyCT();
 
   for (const r of rows) {
     const key = norm(r.song) + '::' + norm(r.artist);
@@ -177,6 +185,7 @@ async function computeStats(env) {
     const mk = monthKeyCT(r.created_at);
     months.set(mk, (months.get(mk) || 0) + 1);
     if (mk === nowMonth) tally(songsThisMonth, key, disp);
+    if (mk === prevMonth) tally(songsPrevMonth, key, disp);
     if (r.occasion) occasions.set(r.occasion, (occasions.get(r.occasion) || 0) + 1);
     if (!catalogTitles.has(norm(r.song)) && norm(r.song)) tally(learnNext, key, disp);
     const win = windows.find(w => r.created_at >= w.start - 3600000 && r.created_at <= w.end + 2700000);
@@ -200,6 +209,7 @@ async function computeStats(env) {
       .map(([month, count]) => ({ month, count })),
     topAll: top(songsAll, 20),
     topThisMonth: top(songsThisMonth, 10),
+    topPrevMonth: top(songsPrevMonth, 10),
     learnNext: top(learnNext, 15),
     occasions: topPairs(occasions, 10),
     venues: topPairs(venues, 10),
@@ -208,14 +218,11 @@ async function computeStats(env) {
   };
 }
 
-// Digest email via the same FormSubmit form the site uses. Server-side
-// fetch sets Origin/Referer to the activated domain so FormSubmit
-// associates it with the jaerichent.com form.
-async function sendDigest(env, scope) {
+// Build the digest email fields (shared by the worker-side send and
+// the dashboard's browser-side send).
+async function buildDigestFields(env, scope) {
   const stats = await computeStats(env);
-  const targetMonth = scope === 'current'
-    ? stats.thisMonthKey
-    : monthKeyCT(Date.now() - 32 * 86400000); // ~previous month
+  const targetMonth = scope === 'current' ? stats.thisMonthKey : prevMonthKeyCT();
   const monthRow = stats.months.find(m => m.month === targetMonth);
   const list = arr => arr.length
     ? arr.map((s, i) => `${i + 1}) ${s.song}${s.artist ? ' — ' + s.artist : ''} (${s.n}x)`).join('   •   ')
@@ -224,21 +231,28 @@ async function sendDigest(env, scope) {
     ? arr.map(p => `${p.name} (${p.n})`).join('   •   ')
     : '(none yet)';
 
-  const fields = {
+  return {
     _subject: `📊 JRP Crowd Favorites Report — ${monthNameCT(targetMonth)}`,
     _template: 'table',
     _captcha: 'false',
     'Report for': monthNameCT(targetMonth) + (scope === 'current' ? ' (month so far)' : ''),
     'Requests this month': String(monthRow ? monthRow.count : 0),
     'Requests all-time': String(stats.total),
-    'Top songs this month': list(stats.topThisMonth),
+    'Top songs this month': list(scope === 'current' ? stats.topThisMonth : stats.topPrevMonth),
     'Top songs all-time': list(stats.topAll.slice(0, 10)),
     '💡 Learn next (requested, not in your catalog)': list(stats.learnNext),
     'Occasions': pairs(stats.occasions),
     'Venues': pairs(stats.venues),
     'Busiest nights': pairs(stats.busiestDays),
   };
+}
 
+// Worker-side send via FormSubmit with Origin/Referer set to the
+// activated domain. NOTE: FormSubmit rate-limits Cloudflare's shared
+// egress IPs hard, so this path often fails — the dashboard's
+// browser-side send (band's own IP) is the reliable primary.
+async function sendDigest(env, scope) {
+  const fields = await buildDigestFields(env, scope);
   const res = await fetch('https://formsubmit.co/ajax/jrichproject@gmail.com', {
     method: 'POST',
     headers: {
@@ -418,6 +432,31 @@ export default {
       const scope = url.searchParams.get('scope') === 'current' ? 'current' : 'prev';
       const result = await sendDigest(env, scope);
       return json({ ok: true, formsubmit: result });
+    }
+
+    // Browser-side digest delivery (the reliable path): the dashboard
+    // checks status, fetches the fields, POSTs to FormSubmit from the
+    // band's own browser/IP, then marks the month done.
+    if (url.pathname === '/api/digest-status' && req.method === 'GET') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      const mk = monthKeyCT(Date.now());
+      const flag = await env.DB.prepare("SELECT v FROM meta WHERE k = 'digest_sent'").first();
+      return json({ pending: !flag || flag.v !== mk, month: mk }, 200, { 'Cache-Control': 'no-store' });
+    }
+
+    if (url.pathname === '/api/digest-fields' && req.method === 'GET') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      const scope = url.searchParams.get('scope') === 'current' ? 'current' : 'prev';
+      return json(await buildDigestFields(env, scope), 200, { 'Cache-Control': 'no-store' });
+    }
+
+    if (url.pathname === '/api/digest-mark' && req.method === 'POST') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      await env.DB.prepare(
+        `INSERT INTO meta (k, v) VALUES ('digest_sent', ?)
+         ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+      ).bind(monthKeyCT(Date.now())).run();
+      return json({ ok: true });
     }
 
     return new Response('Not found', { status: 404 });
@@ -766,6 +805,47 @@ const ADMIN_HTML = `<!DOCTYPE html>
   navLive.addEventListener('click', () => { setView('live'); lastJSON = ''; loadLive(); });
   navHist.addEventListener('click', () => { setView('hist'); loadHistory(); });
   navStats.addEventListener('click', () => { setView('stats'); loadStats(); });
+
+  // ── Monthly report: browser-side delivery ──
+  // FormSubmit rate-limits Cloudflare's server IPs but happily accepts
+  // browser submissions. On each dashboard open: if this month's
+  // report hasn't gone out yet, send it from right here.
+  function note(msg) {
+    let n = document.getElementById('note');
+    if (!n) {
+      n = el('div', null, '');
+      n.id = 'note';
+      n.style.cssText = 'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);' +
+        'background:#14121e;border:1px solid var(--gold);color:#fff;padding:0.8rem 1.3rem;' +
+        'border-radius:50px;font-size:0.9rem;max-width:92vw;text-align:center;z-index:99;' +
+        'box-shadow:0 8px 30px rgba(0,0,0,0.5)';
+      document.body.appendChild(n);
+    }
+    n.textContent = msg;
+    n.hidden = false;
+    clearTimeout(note._t);
+    note._t = setTimeout(() => { n.hidden = true; }, 9000);
+  }
+
+  (async function deliverMonthlyDigest() {
+    try {
+      const st = await (await fetch('/api/digest-status?key=' + encodeURIComponent(KEY))).json();
+      if (!st.pending) return;
+      const fields = await (await fetch('/api/digest-fields?key=' + encodeURIComponent(KEY) + '&scope=prev')).json();
+      const res = await fetch('https://formsubmit.co/ajax/jrichproject@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(fields)
+      });
+      const out = await res.json().catch(() => ({}));
+      if (String(out.success) === 'true') {
+        await fetch('/api/digest-mark?key=' + encodeURIComponent(KEY), { method: 'POST' });
+        note('📊 Monthly Crowd Favorites report emailed to the inbox ✓');
+      } else if (/activat/i.test(out.message || '')) {
+        note('📧 One-time setup: check jrichproject@gmail.com for a FormSubmit "Activate Form" email and click it — the report will send next time you open this page.');
+      }
+    } catch (e) { /* try again next open */ }
+  })();
 
   loadLive();
   setInterval(() => { if (mode === 'live') loadLive(); }, 4000);
