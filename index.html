@@ -1532,6 +1532,133 @@
     }
     .dj-success-text { color: var(--cream-soft); font-size: 0.95rem; }
 
+    /* ─── Now Playing banner (band announces via dashboard) ─── */
+    .np-banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-130%);
+      width: min(560px, calc(100vw - 24px));
+      z-index: 800;
+      background: rgba(20, 18, 30, 0.82);
+      backdrop-filter: blur(18px) saturate(1.3);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid var(--np-accent, var(--gold));
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55),
+                  0 0 24px var(--np-glow, var(--gold-glow)),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      padding: 0.9rem 2.6rem 1rem 1.2rem;
+      overflow: hidden;
+      transition: transform 0.65s var(--ease-spring), opacity 0.4s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .np-banner.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .np-banner.np-birthday    { --np-accent: var(--gold);   --np-glow: rgba(212, 165, 116, 0.4); }
+    .np-banner.np-anniversary { --np-accent: var(--purple); --np-glow: rgba(124, 92, 191, 0.45); }
+    .np-banner.np-special     { --np-accent: var(--success); --np-glow: rgba(92, 184, 122, 0.35); }
+    .np-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--np-accent, var(--gold));
+      margin-bottom: 0.35rem;
+    }
+    .np-eq {
+      width: 4px; height: 12px; border-radius: 2px;
+      background: var(--np-accent, var(--gold));
+      transform-origin: bottom;
+      animation: eqBounce 0.9s ease-in-out infinite;
+      position: relative;
+      display: inline-block;
+      margin: 0 9px 0 2px;
+    }
+    .np-eq::before, .np-eq::after {
+      content: ''; position: absolute; bottom: 0;
+      width: 4px; height: 12px; border-radius: 2px;
+      background: var(--np-accent, var(--gold));
+      transform-origin: bottom;
+      animation: eqBounce 0.9s ease-in-out infinite;
+    }
+    .np-eq::before { left: -7px; animation-delay: -0.3s; }
+    .np-eq::after  { left: 7px;  animation-delay: -0.6s; }
+    .np-song {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.3;
+    }
+    .np-song .np-artist { color: rgba(255, 255, 255, 0.7); font-size: 0.95rem; font-family: 'DM Sans', sans-serif; font-weight: 400; }
+    .np-ded {
+      margin-top: 0.4rem;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--cream-soft);
+    }
+    .np-ded .np-occasion {
+      color: var(--np-accent, var(--gold));
+      font-weight: 800;
+    }
+    .np-ded .np-comment {
+      display: block;
+      margin-top: 0.15rem;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.75);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .np-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .np-close:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+    .np-close:active { transform: scale(0.9); }
+    /* Occasion particles: confetti falls, hearts & sparkles float up */
+    .np-particle {
+      position: absolute;
+      top: -12px;
+      pointer-events: none;
+      user-select: none;
+      animation: npFall linear forwards;
+    }
+    @keyframes npFall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      15%  { opacity: 0.9; }
+      100% { transform: translateY(120px) rotate(200deg); opacity: 0; }
+    }
+    .np-particle.rise { top: auto; bottom: -12px; animation-name: npRise; }
+    @keyframes npRise {
+      0%   { transform: translateY(0) scale(0.8); opacity: 0; }
+      20%  { opacity: 0.8; }
+      100% { transform: translateY(-110px) scale(1.15); opacity: 0; }
+    }
+    .np-confetti-bit {
+      width: 6px; height: 10px; border-radius: 2px;
+    }
+
     /* ─── Accessibility: respect reduced motion ─── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -2964,6 +3091,14 @@
   <!-- ═══ TOAST ═══ -->
   <div class="toast" id="toast"></div>
 
+  <!-- ═══ NOW PLAYING BANNER (announced from the band dashboard) ═══ -->
+  <div class="np-banner" id="np-banner" role="status" aria-live="polite">
+    <div class="np-eyebrow"><span class="np-eq"></span> Now Playing</div>
+    <div class="np-song" id="np-song"></div>
+    <div class="np-ded" id="np-ded"></div>
+    <button class="np-close" id="np-close" aria-label="Dismiss">✕</button>
+  </div>
+
   <script>
     // ═══════════════════════════════════════════════════
     // THE JAE RICH PROJECT — DJ Request System
@@ -3702,6 +3837,127 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) updateDJVisibility();
     });
+
+    // ─── NOW PLAYING BANNER ───
+    // The band taps ✓ Played on their dashboard → the worker publishes
+    // it → every phone on the site shows an occasion-themed banner.
+    // All fan-typed content rendered via textContent.
+    const NP_API = 'https://jrp-live-queue.jrichproject.workers.dev/api/now-playing';
+    const npBanner = document.getElementById('np-banner');
+    let npCurrentId = null;
+    let npDismissedId = null;
+
+    function ordinal(n) {
+      const v = parseInt(n, 10);
+      if (!Number.isFinite(v)) return n;
+      const s = ['th', 'st', 'nd', 'rd'], m = v % 100;
+      return v + (s[(m - 20) % 10] || s[m] || s[0]);
+    }
+
+    function npParticles(kind) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const count = kind === 'confetti' ? 14 : 7;
+      const palette = ['#d4a574', '#e6c9a0', '#c9735b', '#7c5cbf', '#5cb87a'];
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('span');
+        p.className = 'np-particle' + (kind === 'confetti' ? ' np-confetti-bit' : ' rise');
+        if (kind === 'hearts') p.textContent = '♥';
+        if (kind === 'sparkles') p.textContent = '✦';
+        if (kind === 'confetti') p.style.background = palette[i % palette.length];
+        else { p.style.color = palette[i % palette.length]; p.style.fontSize = (0.6 + Math.random() * 0.5) + 'rem'; }
+        p.style.left = (4 + Math.random() * 92) + '%';
+        p.style.animationDuration = (1.6 + Math.random() * 1.8) + 's';
+        p.style.animationDelay = (Math.random() * 1.2) + 's';
+        npBanner.appendChild(p);
+        p.addEventListener('animationend', () => p.remove());
+      }
+    }
+
+    function showNowPlaying(p) {
+      npCurrentId = p.id;
+      const songEl = document.getElementById('np-song');
+      const dedEl = document.getElementById('np-ded');
+      songEl.replaceChildren();
+      dedEl.replaceChildren();
+
+      songEl.appendChild(document.createTextNode('“' + p.song + '”'));
+      if (p.artist) {
+        const a = document.createElement('span');
+        a.className = 'np-artist';
+        a.textContent = ' — ' + p.artist;
+        songEl.appendChild(a);
+      }
+
+      // Occasion-specific headline
+      let occLine = '';
+      let theme = 'np-plain';
+      let particles = null;
+      if (p.occasion === 'Birthday') {
+        theme = 'np-birthday'; particles = 'confetti';
+        occLine = '🎂 Happy ' + (p.years ? ordinal(p.years) + ' ' : '') + 'Birthday' + (p.to_name ? ', ' + p.to_name : '') + '!';
+      } else if (p.occasion === 'Anniversary') {
+        theme = 'np-anniversary'; particles = 'hearts';
+        occLine = '💍 Happy ' + (p.years ? ordinal(p.years) + ' ' : '') + 'Anniversary' + (p.to_name ? ', ' + p.to_name : '') + '!';
+      } else if (p.occasion === 'Special Request') {
+        theme = 'np-special'; particles = 'sparkles';
+        occLine = '⭐ A special dedication' + (p.to_name ? ' for ' + p.to_name : '') + '!';
+      } else if (p.to_name) {
+        occLine = '🎤 Dedicated to ' + p.to_name;
+      }
+
+      if (occLine) {
+        const occ = document.createElement('span');
+        occ.className = 'np-occasion';
+        occ.textContent = occLine;
+        dedEl.appendChild(occ);
+      }
+      if (p.from_name) {
+        dedEl.appendChild(document.createTextNode((occLine ? '  ' : '') + 'From ' + p.from_name + ' 💛'));
+      }
+      if (p.comments) {
+        const c = document.createElement('span');
+        c.className = 'np-comment';
+        c.textContent = '“' + p.comments + '”';
+        dedEl.appendChild(c);
+      }
+      if (!occLine && !p.from_name && !p.comments) {
+        dedEl.textContent = '🎤 Requested by one of you — sing along!';
+      }
+
+      npBanner.classList.remove('np-birthday', 'np-anniversary', 'np-special', 'np-plain');
+      npBanner.classList.add(theme);
+      npBanner.classList.add('show');
+      if (particles) npParticles(particles);
+    }
+
+    function hideNowPlaying() {
+      npCurrentId = null;
+      npBanner.classList.remove('show');
+    }
+
+    async function pollNowPlaying() {
+      if (document.hidden) return;
+      try {
+        const res = await fetch(NP_API);
+        if (!res.ok) return;
+        const { playing } = await res.json();
+        if (!playing || playing.id === npDismissedId) {
+          if (npCurrentId !== null) hideNowPlaying();
+          return;
+        }
+        if (playing.id !== npCurrentId) showNowPlaying(playing);
+      } catch (e) { /* offline blip — keep last state */ }
+    }
+
+    document.getElementById('np-close').addEventListener('click', () => {
+      npDismissedId = npCurrentId;
+      hideNowPlaying();
+    });
+    setInterval(pollNowPlaying, 15000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) pollNowPlaying(); // instant catch-up on re-open
+    });
+    pollNowPlaying();
 
     // ─── GRAND ENTRANCE & GLASSY AMBIENCE ───
     // Intro overlay: the CSS timeline already opened the curtains;

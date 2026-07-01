@@ -196,7 +196,37 @@ export default {
       const id = Number(body.id);
       if (!Number.isInteger(id)) return json({ error: 'bad id' }, 400);
       await env.DB.prepare('UPDATE requests SET played = 1 WHERE id = ?').bind(id).run();
+      // Tapping ✓ Played is the announcement: publish this request as
+      // "now playing" so the public site can show the banner.
+      const row = await env.DB.prepare('SELECT * FROM requests WHERE id = ?').bind(id).first();
+      if (row) {
+        await env.DB.prepare(
+          `INSERT INTO meta (k, v) VALUES ('now_playing', ?)
+           ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+        ).bind(JSON.stringify({ ...row, played_at: Date.now() })).run();
+      }
       return json({ ok: true });
+    }
+
+    // ── Public: what's playing right now (fans' banner) ──
+    // No key needed: this is broadcast info the band chose to announce
+    // by tapping ✓ Played. Expires after one song-length.
+    if (url.pathname === '/api/now-playing' && req.method === 'GET') {
+      const NP_TTL_MS = 4 * 60000;
+      const row = await env.DB.prepare("SELECT v FROM meta WHERE k = 'now_playing'").first();
+      let playing = null;
+      if (row) {
+        const np = JSON.parse(row.v);
+        if (Date.now() - np.played_at <= NP_TTL_MS) {
+          playing = {
+            id: np.id, song: np.song, artist: np.artist,
+            occasion: np.occasion, years: np.years,
+            from_name: np.from_name, to_name: np.to_name,
+            comments: np.comments, played_at: np.played_at
+          };
+        }
+      }
+      return json({ playing }, 200, { ...cors, 'Cache-Control': 'no-store' });
     }
 
     // Permanent single-row delete (band-initiated, from the History view)
