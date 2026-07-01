@@ -19,3 +19,7 @@
 - Rendered the page with Playwright screenshots at desktop and mobile widths.
 - Ran a Playwright interaction check: loaded `#dates`, expanded `46 more dates`, verified July 2 and August 30 render, then scrolled to August 30 and confirmed the private 6:00 PM - 10:00 PM card was visible with opacity `1.0` and no page errors.
 
+## Production deploy
+
+- Deployed a narrowed Cloudflare Pages direct-upload package from commit `28f2acf` so production received only the live-site schedule update package.
+- Verified `https://jaerichent.com/?codex_verify=20260630_posted_1` after deploy: `live_cards=151`, `live_july_aug=46`, `live_last=2026-08-30`, `unique_july_aug=45`.

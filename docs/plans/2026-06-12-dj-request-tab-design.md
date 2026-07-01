@@ -4,7 +4,7 @@ A fourth main tab, "🎧 DJ Request", that exists only during scheduled gig wind
 
 ## Visibility engine
 - Source of truth: the existing Dates gig cards (`.gig-card[data-date]` + `.gig-time` text, e.g. "6:00 PM - 9:00 PM").
-- Window: visible from **60 min before start** to **30 min after end**. Cross-midnight sets handled (end < start ⇒ end +1 day). Device-local time is correct because the audience is physically at the gig.
+- Window: visible from **60 min before start** to **30 min BEFORE end** (changed 2026-07-01; was end+30). Queue auto-reset boundaries remain start−30 / end+30. Cross-midnight sets handled (end < start ⇒ end +1 day). Device-local time is correct because the audience is physically at the gig.
 - Re-evaluated every 30 s, on page focus, and at init. `body.dj-live` class gates tab + panel.
 - Overrides: admin mode ON or `?djtest=1` query param forces visibility (band demo/testing).
 - If the window closes while a fan is viewing the DJ panel, they are switched to Dates.
