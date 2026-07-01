@@ -2,10 +2,11 @@ name = "jrp-live-queue"
 main = "src/index.js"
 compatibility_date = "2026-01-01"
 
-# Auto-reset check: re-parse gig times from jaerichent.com and archive
-# the queue 30 min before / 30 min after each gig window.
+# */5: re-parse gig times from jaerichent.com and auto-reset the queue
+#      (archive 30 min before / 30 min after each gig window)
+# monthly: Crowd Favorites digest email on the 1st (~8-9 AM Central)
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["*/5 * * * *", "0 14 1 * *"]
 
 [[d1_databases]]
 binding = "DB"

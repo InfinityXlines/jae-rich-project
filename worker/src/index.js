@@ -61,29 +61,44 @@ function chicagoUTCms(y, mo, d, h, mi) {
 function parseGigWindowsFromHTML(html) {
   const windows = [];
   const to24 = (h, ap) => (h % 12) + (/pm/i.test(ap) ? 12 : 0);
-  // Each gig card chunk: parse its own date + first time range
+  // Each gig card chunk: parse its own date + first time range + venue
   const chunks = html.split('class="gig-card"').slice(1);
   for (const chunk of chunks) {
     const dm = chunk.match(/data-date="(\d{4})-(\d{2})-(\d{2})"/);
     const tm = chunk.match(/gig-time">\s*(\d{1,2}):(\d{2})\s*(AM|PM)\s*[-–—]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
     if (!dm || !tm) continue;
+    const vm = chunk.match(/gig-venue">\s*([^<]+?)\s*</);
     const [y, mo, d] = [+dm[1], +dm[2], +dm[3]];
     let start = chicagoUTCms(y, mo, d, to24(+tm[1], tm[3]), +tm[2]);
     let end = chicagoUTCms(y, mo, d, to24(+tm[4], tm[6]), +tm[5]);
     if (end <= start) end += 24 * 3600000; // 9 PM - 1 AM sets
-    windows.push({ start, end });
+    windows.push({ start, end, venue: vm ? vm[1] : null });
   }
   return windows;
+}
+
+// The site's 286-song catalog is inline JS: ["Artist", "Title", "Genre"]
+function parseCatalogFromHTML(html) {
+  const triplets = html.matchAll(/\["([^"\\]{1,80})",\s*"([^"\\]{1,80})",\s*"[^"]{1,30}"\]/g);
+  return [...triplets].map(m => ({ artist: m[1], title: m[2] }));
 }
 
 async function refreshGigWindows(env) {
   const res = await fetch(SITE_URL, { headers: { 'User-Agent': 'JRP-Queue-Worker' } });
   if (!res.ok) return null;
-  const windows = parseGigWindowsFromHTML(await res.text());
+  const html = await res.text();
+  const windows = parseGigWindowsFromHTML(html);
   await env.DB.prepare(
     `INSERT INTO meta (k, v) VALUES ('gig_windows', ?)
      ON CONFLICT(k) DO UPDATE SET v = excluded.v`
   ).bind(JSON.stringify({ windows, fetched_at: Date.now() })).run();
+  const catalog = parseCatalogFromHTML(html);
+  if (catalog.length > 50) { // sanity: don't overwrite with a bad parse
+    await env.DB.prepare(
+      `INSERT INTO meta (k, v) VALUES ('catalog', ?)
+       ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+    ).bind(JSON.stringify(catalog)).run();
+  }
   return windows;
 }
 
@@ -120,11 +135,157 @@ async function runQueueReset(env, windows) {
   return { archived: r.meta.changes || 0, lastBoundary };
 }
 
+// ── Crowd Favorites analytics ──
+const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+function monthKeyCT(ts) {
+  // "2026-07" in America/Chicago
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Chicago', year: 'numeric', month: '2-digit',
+  }).format(new Date(ts));
+}
+
+function monthNameCT(key) {
+  const [y, m] = key.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, 15)).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+}
+
+async function computeStats(env) {
+  const { results: rows } = await env.DB.prepare(
+    'SELECT song, artist, occasion, created_at FROM requests ORDER BY created_at DESC LIMIT 5000'
+  ).all();
+  const windows = await getGigWindows(env);
+  const catRow = await env.DB.prepare("SELECT v FROM meta WHERE k = 'catalog'").first();
+  const catalog = catRow ? JSON.parse(catRow.v) : [];
+  const catalogTitles = new Set(catalog.map(c => norm(c.title)));
+
+  const tally = (map, key, display) => {
+    const e = map.get(key) || { ...display, n: 0 };
+    e.n++;
+    map.set(key, e);
+    return e;
+  };
+
+  const songsAll = new Map(), songsThisMonth = new Map(), learnNext = new Map();
+  const months = new Map(), occasions = new Map(), venues = new Map(), days = new Map();
+  const nowMonth = monthKeyCT(Date.now());
+
+  for (const r of rows) {
+    const key = norm(r.song) + '::' + norm(r.artist);
+    const disp = { song: r.song, artist: r.artist || '' };
+    tally(songsAll, key, disp);
+    const mk = monthKeyCT(r.created_at);
+    months.set(mk, (months.get(mk) || 0) + 1);
+    if (mk === nowMonth) tally(songsThisMonth, key, disp);
+    if (r.occasion) occasions.set(r.occasion, (occasions.get(r.occasion) || 0) + 1);
+    if (!catalogTitles.has(norm(r.song)) && norm(r.song)) tally(learnNext, key, disp);
+    const win = windows.find(w => r.created_at >= w.start - 3600000 && r.created_at <= w.end + 2700000);
+    if (win && win.venue) venues.set(win.venue, (venues.get(win.venue) || 0) + 1);
+    const day = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric',
+    }).format(new Date(r.created_at));
+    days.set(day, (days.get(day) || 0) + 1);
+  }
+
+  const top = (map, n) => [...map.values()].sort((a, b) => b.n - a.n).slice(0, n);
+  const topPairs = (map, n) => [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n)
+    .map(([name, count]) => ({ name, n: count }));
+
+  return {
+    generated_at: Date.now(),
+    total: rows.length,
+    thisMonth: months.get(nowMonth) || 0,
+    thisMonthKey: nowMonth,
+    months: [...months.entries()].sort((a, b) => b[0].localeCompare(a[0])).slice(0, 12)
+      .map(([month, count]) => ({ month, count })),
+    topAll: top(songsAll, 20),
+    topThisMonth: top(songsThisMonth, 10),
+    learnNext: top(learnNext, 15),
+    occasions: topPairs(occasions, 10),
+    venues: topPairs(venues, 10),
+    busiestDays: topPairs(days, 5),
+    catalogSize: catalog.length,
+  };
+}
+
+// Digest email via the same FormSubmit form the site uses. Server-side
+// fetch sets Origin/Referer to the activated domain so FormSubmit
+// associates it with the jaerichent.com form.
+async function sendDigest(env, scope) {
+  const stats = await computeStats(env);
+  const targetMonth = scope === 'current'
+    ? stats.thisMonthKey
+    : monthKeyCT(Date.now() - 32 * 86400000); // ~previous month
+  const monthRow = stats.months.find(m => m.month === targetMonth);
+  const list = arr => arr.length
+    ? arr.map((s, i) => `${i + 1}) ${s.song}${s.artist ? ' — ' + s.artist : ''} (${s.n}x)`).join('   •   ')
+    : '(none yet)';
+  const pairs = arr => arr.length
+    ? arr.map(p => `${p.name} (${p.n})`).join('   •   ')
+    : '(none yet)';
+
+  const fields = {
+    _subject: `📊 JRP Crowd Favorites Report — ${monthNameCT(targetMonth)}`,
+    _template: 'table',
+    _captcha: 'false',
+    'Report for': monthNameCT(targetMonth) + (scope === 'current' ? ' (month so far)' : ''),
+    'Requests this month': String(monthRow ? monthRow.count : 0),
+    'Requests all-time': String(stats.total),
+    'Top songs this month': list(stats.topThisMonth),
+    'Top songs all-time': list(stats.topAll.slice(0, 10)),
+    '💡 Learn next (requested, not in your catalog)': list(stats.learnNext),
+    'Occasions': pairs(stats.occasions),
+    'Venues': pairs(stats.venues),
+    'Busiest nights': pairs(stats.busiestDays),
+  };
+
+  const res = await fetch('https://formsubmit.co/ajax/jrichproject@gmail.com', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Origin': 'https://jaerichent.com',
+      'Referer': 'https://jaerichent.com/',
+    },
+    body: JSON.stringify(fields),
+  });
+  let out;
+  try { out = await res.json(); } catch { out = { success: 'unknown', status: res.status }; }
+  return out;
+}
+
+// On the 1st of each month (from 8 AM Central), send the previous
+// month's digest. FormSubmit rate-limits shared Worker IPs, so this is
+// retried by every cron tick until one attempt succeeds; the
+// digest_sent flag guarantees exactly one email per month.
+async function maybeSendMonthlyDigest(env) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', day: 'numeric', hour: 'numeric', hour12: false,
+  }).formatToParts(new Date()).map(p => [p.type, p.value]));
+  if (+parts.day !== 1 || +parts.hour < 8) return;
+  const mk = monthKeyCT(Date.now());
+  const flag = await env.DB.prepare("SELECT v FROM meta WHERE k = 'digest_sent'").first();
+  if (flag && flag.v === mk) return;
+  const res = await sendDigest(env, 'prev');
+  if (res && String(res.success) === 'true') {
+    await env.DB.prepare(
+      `INSERT INTO meta (k, v) VALUES ('digest_sent', ?)
+       ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+    ).bind(mk).run();
+  }
+}
+
 export default {
-  // Cron: refresh schedule from the live site, then apply resets
+  // Crons: */5 = schedule refresh + queue auto-reset + digest retry;
+  // monthly (1st 14:00 UTC ≈ 8-9 AM Central) = first digest attempt.
   async scheduled(event, env) {
+    if (event.cron === '0 14 1 * *') {
+      await maybeSendMonthlyDigest(env);
+      return;
+    }
     const windows = await getGigWindows(env, { forceFresh: true });
     await runQueueReset(env, windows);
+    await maybeSendMonthlyDigest(env);
   },
 
   async fetch(req, env) {
@@ -247,6 +408,18 @@ export default {
       return json({ ok: true, windows: windows.length, ...result });
     }
 
+    if (url.pathname === '/api/stats' && req.method === 'GET') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      return json(await computeStats(env), 200, { 'Cache-Control': 'no-store' });
+    }
+
+    if (url.pathname === '/api/send-digest' && req.method === 'POST') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      const scope = url.searchParams.get('scope') === 'current' ? 'current' : 'prev';
+      const result = await sendDigest(env, scope);
+      return json({ ok: true, formsubmit: result });
+    }
+
     return new Response('Not found', { status: 404 });
   },
 };
@@ -334,6 +507,23 @@ const ADMIN_HTML = `<!DOCTYPE html>
     max-width: 720px; margin: 0 auto; }
   .day-head { font-size: 0.9rem; color: var(--gold); font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; margin-top: 0.75rem; }
+  #stats { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; }
+  .stat-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .stat-chip { flex: 1; min-width: 130px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 0.9rem 1rem; text-align: center; }
+  .stat-chip .big { font-size: 1.7rem; font-weight: 800; color: var(--gold); }
+  .stat-chip .lbl { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55); margin-top: 0.2rem; }
+  .stat-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 0.65rem 0.9rem; }
+  .stat-row .line { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.95rem; }
+  .stat-row .cnt { color: var(--gold); font-weight: 800; flex-shrink: 0; }
+  .stat-bar { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--amber));
+    margin-top: 0.45rem; opacity: 0.8; }
+  button.email-report { align-self: flex-start; background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #000; border: none; border-radius: 50px; font-weight: 800; font-size: 0.95rem;
+    padding: 0.7rem 1.3rem; cursor: pointer; }
+  button.email-report:active { transform: scale(0.95); }
 </style>
 </head>
 <body>
@@ -344,9 +534,11 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <nav>
   <button id="nav-live" class="on">🎶 Live Queue</button>
   <button id="nav-hist">📜 History</button>
+  <button id="nav-stats">📊 Stats</button>
 </nav>
 <div id="list"></div>
 <div id="hist" hidden></div>
+<div id="stats" hidden></div>
 <div class="empty" id="empty" hidden>No requests yet — the booth is quiet. 🎧</div>
 <script>
   const KEY = new URLSearchParams(location.search).get('key');
@@ -488,14 +680,92 @@ const ADMIN_HTML = `<!DOCTYPE html>
     } catch (e) {}
   }
 
-  navLive.addEventListener('click', () => {
-    mode = 'live'; navLive.classList.add('on'); navHist.classList.remove('on');
-    histEl.hidden = true; listEl.hidden = false; lastJSON = ''; loadLive();
-  });
-  navHist.addEventListener('click', () => {
-    mode = 'hist'; navHist.classList.add('on'); navLive.classList.remove('on');
-    listEl.hidden = true; histEl.hidden = false; emptyEl.hidden = true; loadHistory();
-  });
+  // ── Stats view ──
+  const statsEl = document.getElementById('stats');
+  const navStats = document.getElementById('nav-stats');
+
+  function statSection(title) { statsEl.appendChild(el('div', 'day-head', title)); }
+  function statRows(items, fmt) {
+    if (!items.length) { statsEl.appendChild(el('div', 'meta', 'Nothing here yet.')); return; }
+    const max = items[0].n || 1;
+    items.forEach((it, i) => {
+      const row = el('div', 'stat-row');
+      const line = el('div', 'line');
+      line.appendChild(el('span', null, (i + 1) + '.  ' + fmt(it)));
+      line.appendChild(el('span', 'cnt', it.n + '×'));
+      row.appendChild(line);
+      const bar = el('div', 'stat-bar');
+      bar.style.width = Math.max(6, Math.round(it.n / max * 100)) + '%';
+      row.appendChild(bar);
+      statsEl.appendChild(row);
+    });
+  }
+
+  function renderStats(s) {
+    statsEl.replaceChildren();
+    countEl.textContent = s.total + ' all-time';
+
+    const chips = el('div', 'stat-chips');
+    [[s.total, 'All-time requests'], [s.thisMonth, 'This month'],
+     [s.learnNext.reduce((a, b) => a + b.n, 0), 'Not-in-catalog asks']].forEach(([n, lbl]) => {
+      const c = el('div', 'stat-chip');
+      c.appendChild(el('div', 'big', String(n)));
+      c.appendChild(el('div', 'lbl', lbl));
+      chips.appendChild(c);
+    });
+    statsEl.appendChild(chips);
+
+    const btn = el('button', 'email-report', '📧 Email me this report');
+    btn.addEventListener('click', async () => {
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const res = await fetch('/api/send-digest?scope=current&key=' + encodeURIComponent(KEY), { method: 'POST' });
+        const d = await res.json();
+        btn.textContent = (d.formsubmit && String(d.formsubmit.success) === 'true')
+          ? '✓ Sent to the inbox!' : '⚠ Send failed — try again';
+      } catch (e) { btn.textContent = '⚠ Send failed — try again'; }
+      setTimeout(() => { btn.disabled = false; btn.textContent = '📧 Email me this report'; }, 4000);
+    });
+    statsEl.appendChild(btn);
+
+    statSection('🏆 Top Songs — All Time');
+    statRows(s.topAll, it => it.song + (it.artist ? ' — ' + it.artist : ''));
+    statSection('📈 Top Songs — This Month');
+    statRows(s.topThisMonth, it => it.song + (it.artist ? ' — ' + it.artist : ''));
+    statSection('💡 Learn Next — requested, not in your ' + s.catalogSize + '-song catalog');
+    statRows(s.learnNext, it => it.song + (it.artist ? ' — ' + it.artist : ''));
+    statSection('🎉 Occasions');
+    statRows(s.occasions.map(p => ({ n: p.n, name: p.name })), it => it.name);
+    statSection('📍 Venues');
+    statRows(s.venues.map(p => ({ n: p.n, name: p.name })), it => it.name);
+    statSection('🔥 Busiest Nights');
+    statRows(s.busiestDays.map(p => ({ n: p.n, name: p.name })), it => it.name);
+    statSection('🗓 Requests by Month');
+    statRows(s.months.map(m => ({ n: m.count, name: m.month })), it => it.name);
+  }
+
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/stats?key=' + encodeURIComponent(KEY));
+      if (!res.ok) return;
+      renderStats(await res.json());
+    } catch (e) {}
+  }
+
+  function setView(which) {
+    mode = which;
+    navLive.classList.toggle('on', which === 'live');
+    navHist.classList.toggle('on', which === 'hist');
+    navStats.classList.toggle('on', which === 'stats');
+    listEl.hidden = which !== 'live';
+    histEl.hidden = which !== 'hist';
+    statsEl.hidden = which !== 'stats';
+    emptyEl.hidden = true;
+  }
+
+  navLive.addEventListener('click', () => { setView('live'); lastJSON = ''; loadLive(); });
+  navHist.addEventListener('click', () => { setView('hist'); loadHistory(); });
+  navStats.addEventListener('click', () => { setView('stats'); loadStats(); });
 
   loadLive();
   setInterval(() => { if (mode === 'live') loadLive(); }, 4000);
