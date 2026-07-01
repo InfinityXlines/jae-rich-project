@@ -37,7 +37,20 @@ function json(data, status = 200, extra = {}) {
   });
 }
 
-const clean = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+// Strip angle brackets server-side: browser/dashboard rendering is
+// textContent-safe, but fan text also lands in HTML email — a direct
+// API caller must not be able to inject markup into the band's inbox.
+const clean = (v, max) => (typeof v === 'string' ? v.replace(/[<>]/g, '').trim().slice(0, max) : '');
+
+// Constant-time comparison for the admin key
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  const enc = new TextEncoder();
+  const ba = enc.encode(a), bb = enc.encode(b);
+  let diff = 0;
+  for (let i = 0; i < ba.length; i++) diff |= ba[i] ^ bb[i];
+  return diff === 0;
+}
 
 // ── Gig schedule: parse the live site's Dates cards ──
 // America/Chicago wall time → UTC ms (two-pass for DST correctness)
@@ -310,6 +323,19 @@ export default {
 
     // ── Public: submit a request/dedication ──
     if (url.pathname === '/api/requests' && req.method === 'POST') {
+      // Abuse guards: bounded payload, global rate window, pending cap.
+      // Limits sit far above real gig traffic but stop scripted floods.
+      if (+(req.headers.get('content-length') || 0) > 16384) {
+        return json({ error: 'too large' }, 413, cors);
+      }
+      const recent = await env.DB.prepare(
+        'SELECT COUNT(*) AS n FROM requests WHERE created_at > ?'
+      ).bind(Date.now() - 60000).first();
+      if (recent.n >= 30) return json({ error: 'slow down — try again in a minute' }, 429, cors);
+      const backlog = await env.DB.prepare(
+        'SELECT COUNT(*) AS n FROM requests WHERE played = 0 AND archived = 0'
+      ).first();
+      if (backlog.n >= 200) return json({ error: 'queue is full' }, 429, cors);
       let body;
       try { body = await req.json(); } catch { return json({ error: 'bad json' }, 400, cors); }
       const song = clean(body.song, 80);
@@ -373,12 +399,18 @@ export default {
 
     // ── Band-only routes ──
     const key = url.searchParams.get('key') || '';
-    const authed = env.ADMIN_KEY && key === env.ADMIN_KEY;
+    const authed = Boolean(env.ADMIN_KEY) && safeEqual(key, env.ADMIN_KEY);
 
     if (url.pathname === '/admin') {
       if (!authed) return new Response('Not found', { status: 404 });
       return new Response(ADMIN_HTML, {
-        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Referrer-Policy': 'no-referrer',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+        },
       });
     }
 
@@ -508,6 +540,7 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
 <title>JRP — Live Request Queue</title>
 <style>
   :root {
