@@ -835,7 +835,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
       const res = await fetch('https://formsubmit.co/ajax/jrichproject@gmail.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(fields)
+        body: JSON.stringify(fields),
+        signal: AbortSignal.timeout(15000)
       });
       const out = await res.json().catch(() => ({}));
       if (String(out.success) === 'true') {
@@ -843,8 +844,12 @@ const ADMIN_HTML = `<!DOCTYPE html>
         note('📊 Monthly Crowd Favorites report emailed to the inbox ✓');
       } else if (/activat/i.test(out.message || '')) {
         note('📧 One-time setup: check jrichproject@gmail.com for a FormSubmit "Activate Form" email and click it — the report will send next time you open this page.');
+      } else {
+        note('⚠ Monthly report send failed: ' + (out.message || ('HTTP ' + res.status)) + ' — will retry on your next visit.');
       }
-    } catch (e) { /* try again next open */ }
+    } catch (e) {
+      note('⚠ Monthly report send error: ' + e.message + ' — will retry on your next visit.');
+    }
   })();
 
   loadLive();
