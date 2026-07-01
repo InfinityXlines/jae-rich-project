@@ -334,6 +334,43 @@ export default {
       return json({ ok: true }, 200, cors);
     }
 
+    // ── Public: monthly digest relay ──
+    // jaerichent.com is the FormSubmit-activated origin, so the site's
+    // visitors deliver the monthly report from their browsers. The
+    // payload is claim-leased for 3 min so simultaneous visitors don't
+    // all send; digest-done requires the nonce issued with the claim.
+    if (url.pathname === '/api/digest-payload' && req.method === 'GET') {
+      const mk = monthKeyCT(Date.now());
+      const flag = await env.DB.prepare("SELECT v FROM meta WHERE k = 'digest_sent'").first();
+      if (flag && flag.v === mk) return json({ pending: false }, 200, cors);
+      const claim = await env.DB.prepare("SELECT v FROM meta WHERE k = 'digest_claim'").first();
+      if (claim) {
+        const c = JSON.parse(claim.v);
+        if (Date.now() - c.at < 180000) return json({ pending: false }, 200, cors);
+      }
+      const nonce = crypto.randomUUID();
+      await env.DB.prepare(
+        `INSERT INTO meta (k, v) VALUES ('digest_claim', ?)
+         ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+      ).bind(JSON.stringify({ at: Date.now(), nonce })).run();
+      const fields = await buildDigestFields(env, 'prev');
+      return json({ pending: true, nonce, fields }, 200, cors);
+    }
+
+    if (url.pathname === '/api/digest-done' && req.method === 'POST') {
+      let body;
+      try { body = await req.json(); } catch { return json({ error: 'bad json' }, 400, cors); }
+      const claim = await env.DB.prepare("SELECT v FROM meta WHERE k = 'digest_claim'").first();
+      if (!claim || JSON.parse(claim.v).nonce !== body.nonce) {
+        return json({ error: 'bad nonce' }, 403, cors);
+      }
+      await env.DB.prepare(
+        `INSERT INTO meta (k, v) VALUES ('digest_sent', ?)
+         ON CONFLICT(k) DO UPDATE SET v = excluded.v`
+      ).bind(monthKeyCT(Date.now())).run();
+      return json({ ok: true }, 200, cors);
+    }
+
     // ── Band-only routes ──
     const key = url.searchParams.get('key') || '';
     const authed = env.ADMIN_KEY && key === env.ADMIN_KEY;
