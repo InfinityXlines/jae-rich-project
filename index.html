@@ -6,7 +6,7 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>THE JAE RICH PROJECT — Live Song Requests</title>
+  <title>THE JAE RICH PROJECT — Live DJ Requests</title>
   <meta name="description" content="The Jae Rich Project — A duo of soulful vocals, smooth guitar work and feel-good energy covering rock, soul, pop, funk, motown, top 40 and beyond.">
   <meta name="theme-color" content="#0a0a0f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1633,7 +1633,7 @@
       </button>
       <button class="main-tab" id="tab-dj" onclick="switchTab('dj')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0118 0v6M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3m18 5a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3"/></svg>
-        Song Requests
+        DJ Requests
         <span class="onair-dot"></span>
       </button>
       <button class="main-tab" id="tab-contact" onclick="switchTab('contact')">
@@ -2884,10 +2884,10 @@
       </div>
       <div class="dj-form" id="dj-form">
         <div class="dj-field-wrap">
-          <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="80" autocomplete="off">
+          <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="80" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
           <div class="dj-quickpick" id="dj-quickpick"></div>
         </div>
-        <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="80" autocomplete="off">
+        <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="80" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
 
         <button type="button" class="ded-toggle" id="ded-toggle" aria-expanded="false">
           💝 Add a dedication <span class="ded-toggle-hint">(optional)</span>
@@ -2900,10 +2900,10 @@
             <button type="button" class="ded-chip" data-occasion="Anniversary">💍 Anniversary</button>
             <button type="button" class="ded-chip" data-occasion="Special Request">⭐ Special Request</button>
           </div>
-          <input type="text" class="dj-input" id="ded-years" placeholder="How many years? (optional)" maxlength="10" inputmode="numeric" autocomplete="off" hidden>
-          <input type="text" class="dj-input" id="ded-to" placeholder="Dedication is for… (e.g. Angela)" maxlength="40" autocomplete="off">
-          <input type="text" class="dj-input" id="ded-from" placeholder="From… (your name)" maxlength="40" autocomplete="off">
-          <input type="text" class="dj-input" id="ded-comments" placeholder="Anything we should say? (e.g. Angela's 50th birthday!)" maxlength="200" autocomplete="off">
+          <input type="text" class="dj-input" id="ded-years" placeholder="How many years? (optional)" maxlength="10" inputmode="numeric" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true" hidden>
+          <input type="text" class="dj-input" id="ded-to" placeholder="Dedication is for… (e.g. Angela)" maxlength="40" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
+          <input type="text" class="dj-input" id="ded-from" placeholder="From… (your name)" maxlength="40" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
+          <input type="text" class="dj-input" id="ded-comments" placeholder="Anything we should say? (e.g. Angela's 50th birthday!)" maxlength="200" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
         </div>
 
         <button class="dj-submit" id="dj-submit">🎧 Send It to the Booth</button>
@@ -2966,7 +2966,7 @@
 
   <script>
     // ═══════════════════════════════════════════════════
-    // THE JAE RICH PROJECT — Song Request System
+    // THE JAE RICH PROJECT — DJ Request System
     // ═══════════════════════════════════════════════════
 
     // ─── TAB SWITCHING ───
@@ -3524,13 +3524,14 @@
     // ─── DJ / DEDICATIONS (gig-time only) ───
     // The Dates gig cards are the single source of truth: each card's
     // data-date + "H:MM AM - H:MM PM" time text defines a gig window.
-    // The DJ tab exists from 60 min before downbeat to 30 min after
-    // the listed end. Admin mode or ?djtest in the URL forces it on.
+    // The tab opens 60 min before downbeat and CLOSES 30 min before
+    // the listed end — no new requests land during the final stretch.
+    // Admin mode or ?djtest in the URL forces it on.
     // Requests go to the band-only live queue (Cloudflare Worker + D1)
     // AND to the email inbox — neither failing blocks the other.
     const QUEUE_API = 'https://jrp-live-queue.jrichproject.workers.dev/api/requests';
-    const DJ_PRE_MS = 60 * 60000;
-    const DJ_POST_MS = 30 * 60000;
+    const DJ_PRE_MS = 60 * 60000;        // opens 60 min before start
+    const DJ_END_EARLY_MS = 30 * 60000;  // closes 30 min before end
     const DJ_EXTRA_WINDOWS = [
       { start: new Date(2026, 5, 20, 18, 0).getTime(), end: new Date(2026, 5, 20, 22, 30).getTime() }
     ];
@@ -3555,7 +3556,7 @@
     function updateDJVisibility() {
       const forced = adminMode || new URLSearchParams(location.search).has('djtest');
       const now = Date.now();
-      const live = parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end + DJ_POST_MS);
+      const live = parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end - DJ_END_EARLY_MS);
       const show = forced || live;
       document.body.classList.toggle('dj-live', show);
       if (!show && document.getElementById('panel-dj').classList.contains('active')) {
