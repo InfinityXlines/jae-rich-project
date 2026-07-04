@@ -1426,35 +1426,6 @@
       box-shadow: 0 6px 24px var(--gold-glow);
     }
     .dj-submit:active { transform: scale(0.96); }
-    .dj-quickpick {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      margin-top: 4px;
-      background: var(--bg-card-solid);
-      border: 1px solid var(--gold);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      z-index: 20;
-      display: none;
-      animation: panelIn 0.25s var(--ease-out-expo);
-    }
-    .dj-quickpick.open { display: block; }
-    .dj-quickpick-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.7rem 1rem;
-      cursor: pointer;
-      font-size: 0.95rem;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.15s ease;
-    }
-    .dj-quickpick-item:last-child { border-bottom: none; }
-    .dj-quickpick-item:hover, .dj-quickpick-item:active { background: var(--purple-soft); }
-    .dj-quickpick-item .qp-artist { color: var(--gold); font-weight: 600; white-space: nowrap; }
-    .dj-quickpick-item .qp-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .dj-field-wrap { position: relative; }
 
     /* ─── Dedication section ─── */
@@ -3036,7 +3007,6 @@
       <div class="dj-form" id="dj-form">
         <div class="dj-field-wrap">
           <input type="text" class="dj-input" id="dj-song" placeholder="Song title *" maxlength="80" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
-          <div class="dj-quickpick" id="dj-quickpick"></div>
         </div>
         <input type="text" class="dj-input" id="dj-artist" placeholder="Artist (optional)" maxlength="80" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true">
 
@@ -3822,39 +3792,9 @@
       } catch (e) { /* band queue still gets it */ }
     }
 
-    // Quick-pick: live-filter the catalog as the song title is typed
-    const djQuickpickEl = document.getElementById('dj-quickpick');
-    function hideQuickpick() { djQuickpickEl.classList.remove('open'); }
-
-    document.getElementById('dj-song').addEventListener('input', (e) => {
-      const term = e.target.value.trim().toLowerCase();
-      if (term.length < 2) { hideQuickpick(); return; }
-      const hits = SONGS.filter(([a, t]) =>
-        t.toLowerCase().includes(term) || a.toLowerCase().includes(term)
-      ).slice(0, 6);
-      if (!hits.length) { hideQuickpick(); return; }
-      djQuickpickEl.replaceChildren();
-      hits.forEach(([artist, title]) => {
-        const row = el('div', 'dj-quickpick-item');
-        row.dataset.artist = artist;
-        row.dataset.title = title;
-        row.appendChild(el('span', 'qp-title', title));
-        row.appendChild(el('span', 'qp-artist', artist));
-        djQuickpickEl.appendChild(row);
-      });
-      djQuickpickEl.classList.add('open');
-    });
-
-    djQuickpickEl.addEventListener('click', (e) => {
-      const item = e.target.closest('.dj-quickpick-item');
-      if (!item) return;
-      document.getElementById('dj-song').value = item.dataset.title;
-      document.getElementById('dj-artist').value = item.dataset.artist;
-      hideQuickpick();
-    });
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.dj-field-wrap')) hideQuickpick();
-    });
+    // (Catalog quick-pick removed — this tab is for ANY song, so the
+    // song field is free-form with no dropdown suggestions.)
+    function hideQuickpick() {}
 
     document.getElementById('dj-submit').addEventListener('click', submitDedication);
 
