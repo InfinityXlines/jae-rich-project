@@ -10,7 +10,7 @@
 // History is never deleted: rows are archived (queue reset) or played.
 
 const SITE_URL = 'https://jaerichent.com/';
-const RESET_BEFORE_MS = 30 * 60000;
+const RESET_BEFORE_MS = 60 * 60000; // match the tab's 60-min early open so early-bird requests survive the reset
 const RESET_AFTER_MS = 30 * 60000;
 const WINDOW_CACHE_MS = 6 * 3600000; // re-parse the site at most every 6h on the lazy path
 
@@ -87,6 +87,20 @@ function parseGigWindowsFromHTML(html) {
     if (end <= start) end += 24 * 3600000; // 9 PM - 1 AM sets
     windows.push({ start, end, venue: vm ? vm[1] : null });
   }
+  // One-off exact windows (DJ_EXACT_WINDOWS in the site JS) count as gig
+  // windows too, so unlisted events still get reset-boundary protection.
+  // The site's local Date literals are Central time; months are 0-based.
+  const exacts = html.matchAll(
+    /open:\s*new Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2}),\s*(\d{1,2}),\s*(\d{1,2})\)\.getTime\(\),\s*close:\s*new Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2}),\s*(\d{1,2}),\s*(\d{1,2})\)\.getTime\(\)/g
+  );
+  for (const m of exacts) {
+    const n = m.slice(1).map(Number);
+    windows.push({
+      start: chicagoUTCms(n[0], n[1] + 1, n[2], n[3], n[4]),
+      end: chicagoUTCms(n[5], n[6] + 1, n[7], n[8], n[9]),
+      venue: null
+    });
+  }
   return windows;
 }
 
@@ -133,10 +147,27 @@ async function getGigWindows(env, { forceFresh = false } = {}) {
 // The queue should only ever contain requests newer than the most
 // recent reset boundary. Boundaries: gig start − 30 min, gig end + 30 min.
 // Idempotent — safe to run as often as we like.
+// Overlapping / back-to-back gigs (e.g. two venues in one evening) are one
+// continuous session: merge before computing boundaries so one gig's start
+// boundary can't archive the other gig's live queue mid-set.
+function mergeWindows(windows) {
+  const sorted = [...windows].sort((a, b) => a.start - b.start);
+  const merged = [];
+  for (const w of sorted) {
+    const last = merged[merged.length - 1];
+    if (last && w.start - last.end <= RESET_BEFORE_MS + RESET_AFTER_MS) {
+      if (w.end > last.end) last.end = w.end;
+    } else {
+      merged.push({ start: w.start, end: w.end });
+    }
+  }
+  return merged;
+}
+
 async function runQueueReset(env, windows) {
   const now = Date.now();
   let lastBoundary = 0;
-  for (const w of windows) {
+  for (const w of mergeWindows(windows)) {
     for (const b of [w.start - RESET_BEFORE_MS, w.end + RESET_AFTER_MS]) {
       if (b <= now && b > lastBoundary) lastBoundary = b;
     }
