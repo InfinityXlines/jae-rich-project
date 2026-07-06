@@ -1457,6 +1457,8 @@
       gap: 0.75rem;
       animation: panelIn 0.4s var(--ease-out-expo);
     }
+    /* author display:flex beats the UA [hidden] rule — force real collapse */
+    .ded-fields[hidden] { display: none !important; }
     .ded-chips {
       display: flex;
       gap: 0.5rem;
