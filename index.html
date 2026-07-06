@@ -3666,6 +3666,13 @@
     const DJ_EXTRA_WINDOWS = [
       { start: new Date(2026, 5, 20, 18, 0).getTime(), end: new Date(2026, 5, 20, 22, 30).getTime() }
     ];
+    // One-off exact windows: while one is in effect (12h before open until
+    // close) it is the sole authority — the line runs open→close with NO
+    // ±offsets and the card-derived windows are ignored for that stretch.
+    const DJ_EXACT_WINDOWS = [
+      // Jul 7, 2026: unlisted one-off — line runs 4:30-9:30 sharp
+      { open: new Date(2026, 6, 7, 16, 30).getTime(), close: new Date(2026, 6, 7, 21, 30).getTime() }
+    ];
 
     function parseGigWindows() {
       const wins = [];
@@ -3687,7 +3694,10 @@
     function updateDJVisibility() {
       const forced = adminMode || new URLSearchParams(location.search).has('djtest');
       const now = Date.now();
-      const live = parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end - DJ_END_EARLY_MS);
+      const exact = DJ_EXACT_WINDOWS.find(w => now >= w.open - 12 * 3600000 && now <= w.close);
+      const live = exact
+        ? now >= exact.open
+        : parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end - DJ_END_EARLY_MS);
       const show = forced || live;
       document.body.classList.toggle('dj-live', show);
       if (!show && document.getElementById('panel-dj').classList.contains('active')) {
