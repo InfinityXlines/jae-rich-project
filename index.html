@@ -3483,6 +3483,10 @@
     // ─── EMAIL ALERT ───
     // Fire-and-forget email to the band when a request comes in.
     // Uses FormSubmit's AJAX endpoint — activated for jaerichent.com.
+    // Per-request alerts OFF (July 6, 2026) — the band watches the live
+    // queue dashboard instead. Flip to true to resume emails. The monthly
+    // digest relay further down is a separate path and stays on.
+    const EMAIL_ALERTS = false;
     const ALERT_ENDPOINT = 'https://formsubmit.co/ajax/jrichproject@gmail.com';
 
     // ─── UTILITIES ───
@@ -3782,6 +3786,7 @@
     }
 
     function sendDedicationAlert(p) {
+      if (!EMAIL_ALERTS) return;
       try {
         fetch(ALERT_ENDPOINT, {
           method: 'POST',
