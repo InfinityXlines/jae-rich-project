@@ -1616,6 +1616,30 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
+    /* ─── Celebration spotlight (band-approved dedications) ─── */
+    .celebrate-spot { max-width: 560px; margin: 1.75rem auto 0; padding: 0 12px; }
+    .celebrate-spot[hidden] { display: none !important; }
+    .cs-card {
+      border: 1px solid var(--cs-accent, var(--gold));
+      border-radius: var(--radius);
+      background: rgba(20, 18, 30, 0.6);
+      box-shadow: 0 0 22px var(--cs-glow, rgba(212, 165, 116, 0.18));
+      padding: 1.15rem 1.3rem 1.25rem;
+      text-align: center;
+      transition: opacity 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+    }
+    .cs-card.cs-birthday    { --cs-accent: var(--gold);   --cs-glow: rgba(212, 165, 116, 0.25); }
+    .cs-card.cs-anniversary { --cs-accent: var(--purple); --cs-glow: rgba(124, 92, 191, 0.3); }
+    .cs-eyebrow {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--cs-accent, var(--gold));
+    }
+    .cs-name {
+      font-family: 'Playfair Display', serif; font-size: 1.35rem;
+      color: var(--cream); margin-top: 0.45rem; line-height: 1.3;
+    }
+    .cs-sub { font-size: 0.92rem; color: var(--cream-soft); margin-top: 0.3rem; }
+    @media (prefers-reduced-motion: reduce) { .cs-card { transition: none; } }
     .np-close {
       position: absolute;
       top: 8px;
@@ -1750,6 +1774,15 @@
 
   <!-- ═══ TABBED CONTENT ═══ -->
   <div class="content-area" id="content-area">
+    <!-- ─── CELEBRATION SPOTLIGHT (band-approved, gig-time only) ─── -->
+    <section class="celebrate-spot" id="celebrate-spot" hidden aria-live="polite">
+      <div class="cs-card cs-birthday" id="cs-card">
+        <div class="cs-eyebrow">🥂 Tonight We Raise a Glass</div>
+        <div class="cs-name" id="cs-name"></div>
+        <div class="cs-sub" id="cs-sub"></div>
+      </div>
+    </section>
+
     <div class="main-tabs">
       <button class="main-tab active" id="tab-dates" onclick="switchTab('dates')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -3939,6 +3972,53 @@
       if (!document.hidden) pollNowPlaying(); // instant catch-up on re-open
     });
     pollNowPlaying();
+
+    // ─── CELEBRATION SPOTLIGHT ───
+    // Rotates through dedications the band approved via the dashboard's
+    // 🎉 button. Gig-time only; every entry is band-curated, so nothing
+    // fan-typed reaches this card without a human okaying it.
+    const CELEBRATE_API = QUEUE_API.replace('/api/requests', '/api/celebrations');
+    const csSpot = document.getElementById('celebrate-spot');
+    const csCard = document.getElementById('cs-card');
+    const csName = document.getElementById('cs-name');
+    const csSub = document.getElementById('cs-sub');
+    let csList = [], csIdx = 0, csKey = '';
+
+    function csShow() {
+      if (!csList.length) { csSpot.hidden = true; return; }
+      const c = csList[csIdx % csList.length];
+      const kind = c.occasion === 'Birthday' ? 'Birthday' : 'Anniversary';
+      const years = c.years ? ordinal(c.years) + ' ' : '';
+      csName.textContent = (c.to_name ? c.to_name + ' — ' : '') + 'Happy ' + years + kind + '!';
+      csSub.textContent = c.from_name ? 'With love from ' + c.from_name + ' 💛' : '';
+      csCard.classList.toggle('cs-birthday', kind === 'Birthday');
+      csCard.classList.toggle('cs-anniversary', kind === 'Anniversary');
+      csSpot.hidden = false;
+    }
+
+    function csRotate() {
+      if (csList.length < 2 || document.hidden) return;
+      csCard.style.opacity = '0';
+      setTimeout(() => { csIdx++; csShow(); csCard.style.opacity = '1'; }, 500);
+    }
+
+    async function pollCelebrations() {
+      if (document.hidden) return;
+      if (!document.body.classList.contains('dj-live')) { csSpot.hidden = true; return; }
+      try {
+        const res = await fetch(CELEBRATE_API);
+        if (!res.ok) return;
+        const list = (await res.json()).celebrations || [];
+        const key = JSON.stringify(list.map(c => c.id));
+        if (key !== csKey) { csKey = key; csIdx = 0; }
+        csList = list;
+        csShow();
+      } catch (e) {}
+    }
+    setInterval(pollCelebrations, 45000);
+    setInterval(csRotate, 7000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) pollCelebrations(); });
+    pollCelebrations();
 
     // ─── MONTHLY REPORT RELAY ───
     // FormSubmit rate-limits Cloudflare's servers but happily accepts
