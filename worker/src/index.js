@@ -504,6 +504,18 @@ export default {
       return json({ playing }, 200, { ...cors, 'Cache-Control': 'no-store' });
     }
 
+    // ── Public: tonight's celebrations (band-approved only) ──
+    // No key needed: each row appears only after the band taps 🎉 on the
+    // dashboard. Names and occasions only — no comments, no song titles.
+    if (url.pathname === '/api/celebrations' && req.method === 'GET') {
+      const { results } = await env.DB.prepare(
+        `SELECT id, occasion, years, to_name, from_name FROM requests
+         WHERE celebrate = 1 AND created_at > ?
+         ORDER BY created_at ASC LIMIT 30`
+      ).bind(Date.now() - 12 * 3600000).all();
+      return json({ celebrations: results }, 200, { ...cors, 'Cache-Control': 'no-store' });
+    }
+
     // Permanent single-row delete (band-initiated, from the History view)
     if (url.pathname === '/api/delete' && req.method === 'POST') {
       if (!authed) return new Response('Not found', { status: 404 });
@@ -512,6 +524,18 @@ export default {
       const id = Number(body.id);
       if (!Number.isInteger(id)) return json({ error: 'bad id' }, 400);
       await env.DB.prepare('DELETE FROM requests WHERE id = ?').bind(id).run();
+      return json({ ok: true });
+    }
+
+    // Band-only: toggle a dedication onto/off the public celebration spotlight
+    if (url.pathname === '/api/celebrate' && req.method === 'POST') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      let body;
+      try { body = await req.json(); } catch { return json({ error: 'bad json' }, 400); }
+      const id = Number(body.id);
+      if (!Number.isInteger(id)) return json({ error: 'bad id' }, 400);
+      await env.DB.prepare('UPDATE requests SET celebrate = ? WHERE id = ?')
+        .bind(body.on ? 1 : 0, id).run();
       return json({ ok: true });
     }
 
@@ -643,6 +667,16 @@ const ADMIN_HTML = `<!DOCTYPE html>
   }
   button.del:hover { color: #ff6b61; border-color: rgba(255,59,48,0.5); }
   button.del:active { transform: scale(0.94); }
+  button.cel {
+    background: none; color: var(--gold);
+    border: 1px solid rgba(212,165,116,0.5); border-radius: 50px;
+    font-size: 0.85rem; font-weight: 700; padding: 0.55rem 0.9rem;
+    cursor: pointer; flex-shrink: 0; transition: all 0.15s ease;
+  }
+  button.cel.on { background: linear-gradient(135deg, var(--gold), var(--amber)); color: #000; border-color: transparent; }
+  button.cel:active { transform: scale(0.94); }
+  .btns { display: flex; flex-direction: column; gap: 0.45rem; flex-shrink: 0; min-width: 118px; }
+  .btns button { width: 100%; }
   .empty { text-align: center; color: rgba(255,255,255,0.55); padding: 3rem 1rem; font-style: italic;
     max-width: 720px; margin: 0 auto; }
   .day-head { font-size: 0.9rem; color: var(--gold); font-weight: 800; letter-spacing: 0.08em;
@@ -740,7 +774,7 @@ const ADMIN_HTML = `<!DOCTYPE html>
   }
 
   async function deleteReq(id, card, song) {
-    if (!confirm('Delete "' + song + '" from history forever? This cannot be undone.')) return;
+    if (!confirm('Delete "' + song + '" permanently? This cannot be undone.')) return;
     card.style.opacity = '0.35';
     try {
       await fetch('/api/delete?key=' + encodeURIComponent(KEY), {
@@ -749,7 +783,32 @@ const ADMIN_HTML = `<!DOCTYPE html>
         body: JSON.stringify({ id })
       });
     } catch (e) { card.style.opacity = '1'; return; }
-    loadHistory();
+    if (mode === 'live') { lastJSON = ''; loadLive(); } else loadHistory();
+  }
+
+  function setCelBtn(btn, on) {
+    btn.textContent = on ? '🌟 Celebrating' : '🎉 Celebrate';
+    btn.classList.toggle('on', !!on);
+  }
+
+  async function toggleCelebrate(r, btn) {
+    const on = r.celebrate ? 0 : 1;
+    btn.disabled = true;
+    try {
+      await fetch('/api/celebrate?key=' + encodeURIComponent(KEY), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: r.id, on })
+      });
+      r.celebrate = on;
+      lastJSON = '';
+    } catch (e) {}
+    btn.disabled = false;
+    setCelBtn(btn, r.celebrate);
+  }
+
+  function isCelebration(r) {
+    return r.occasion === 'Birthday' || r.occasion === 'Anniversary';
   }
 
   function renderLive(queue) {
@@ -766,9 +825,20 @@ const ADMIN_HTML = `<!DOCTYPE html>
       if (ded) body.appendChild(ded);
       body.appendChild(el('div', 'meta', timeAgo(r.created_at)));
       card.appendChild(body);
+      const btns = el('div', 'btns');
       const btn = el('button', 'done', '✓ Played');
       btn.addEventListener('click', () => markPlayed(r.id, card));
-      card.appendChild(btn);
+      btns.appendChild(btn);
+      if (isCelebration(r)) {
+        const cel = el('button', 'cel');
+        setCelBtn(cel, r.celebrate);
+        cel.addEventListener('click', () => toggleCelebrate(r, cel));
+        btns.appendChild(cel);
+      }
+      const del = el('button', 'del', '🗑 Delete');
+      del.addEventListener('click', () => deleteReq(r.id, card, r.song));
+      btns.appendChild(del);
+      card.appendChild(btns);
       listEl.appendChild(card);
     });
   }
@@ -794,9 +864,17 @@ const ADMIN_HTML = `<!DOCTYPE html>
       meta.appendChild(el('span', 'badge ' + status[0], status[1]));
       body.appendChild(meta);
       card.appendChild(body);
+      const btns = el('div', 'btns');
+      if (isCelebration(r)) {
+        const cel = el('button', 'cel');
+        setCelBtn(cel, r.celebrate);
+        cel.addEventListener('click', () => toggleCelebrate(r, cel));
+        btns.appendChild(cel);
+      }
       const del = el('button', 'del', '🗑 Delete');
       del.addEventListener('click', () => deleteReq(r.id, card, r.song));
-      card.appendChild(del);
+      btns.appendChild(del);
+      card.appendChild(btns);
       histEl.appendChild(card);
     });
   }
