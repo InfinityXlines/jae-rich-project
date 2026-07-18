@@ -527,6 +527,35 @@ export default {
       return json({ ok: true });
     }
 
+    // Band-only: every birthday/anniversary shoutout fans have sent in —
+    // occasion-chip rows plus any comment that mentions one. Full text,
+    // newest first, so the band can read them on the mic.
+    if (url.pathname === '/api/shoutouts' && req.method === 'GET') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      const { results } = await env.DB.prepare(
+        `SELECT * FROM requests
+         WHERE occasion IN ('Birthday', 'Anniversary')
+            OR lower(comments) LIKE '%birthday%'
+            OR lower(comments) LIKE '%b-day%'
+            OR lower(comments) LIKE '%bday%'
+            OR lower(comments) LIKE '%anniversary%'
+         ORDER BY created_at DESC LIMIT 500`
+      ).all();
+      return json({ shoutouts: results }, 200, { 'Cache-Control': 'no-store' });
+    }
+
+    // Band-only: check/uncheck "read on the mic" for a shoutout
+    if (url.pathname === '/api/announce' && req.method === 'POST') {
+      if (!authed) return new Response('Not found', { status: 404 });
+      let body;
+      try { body = await req.json(); } catch { return json({ error: 'bad json' }, 400); }
+      const id = Number(body.id);
+      if (!Number.isInteger(id)) return json({ error: 'bad id' }, 400);
+      await env.DB.prepare('UPDATE requests SET announced = ? WHERE id = ?')
+        .bind(body.on ? 1 : 0, id).run();
+      return json({ ok: true });
+    }
+
     // Band-only: toggle a dedication onto/off the public celebration spotlight
     if (url.pathname === '/api/celebrate' && req.method === 'POST') {
       if (!authed) return new Response('Not found', { status: 404 });
@@ -629,7 +658,17 @@ const ADMIN_HTML = `<!DOCTYPE html>
     cursor: pointer;
   }
   nav button.on { border-color: var(--gold); color: var(--gold); }
-  #list, #hist { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; }
+  #list, #hist, #shout { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; }
+  button.ack {
+    background: none; color: var(--gold);
+    border: 1px solid rgba(212,165,116,0.5); border-radius: 50px;
+    font-size: 0.85rem; font-weight: 700; padding: 0.55rem 0.9rem;
+    cursor: pointer; flex-shrink: 0; transition: all 0.15s ease;
+  }
+  button.ack.on { background: linear-gradient(135deg, var(--success), #3f8f5c); color: #000; border-color: transparent; }
+  button.ack:active { transform: scale(0.94); }
+  .req.announced { opacity: 0.55; }
+  .req.announced .song { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.4); }
   .req {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
     padding: 1rem 1.1rem; display: flex; gap: 1rem; align-items: flex-start;
@@ -708,10 +747,12 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <nav>
   <button id="nav-live" class="on">🎶 Live Queue</button>
   <button id="nav-hist">📜 History</button>
+  <button id="nav-shout">🎂 Shoutouts</button>
   <button id="nav-stats">📊 Stats</button>
 </nav>
 <div id="list"></div>
 <div id="hist" hidden></div>
+<div id="shout" hidden></div>
 <div id="stats" hidden></div>
 <div class="empty" id="empty" hidden>No requests yet — the booth is quiet. 🎧</div>
 <script>
@@ -898,6 +939,71 @@ const ADMIN_HTML = `<!DOCTYPE html>
     } catch (e) {}
   }
 
+  // ── Shoutouts view: every birthday/anniversary sent in, full text,
+  //    with a "✓ Read on mic" check the whole band shares ──
+  const shoutEl = document.getElementById('shout');
+  const navShout = document.getElementById('nav-shout');
+
+  function setAckBtn(btn, on) {
+    btn.textContent = on ? '✅ Read on mic' : '🎤 Mark as read';
+    btn.classList.toggle('on', !!on);
+  }
+
+  async function toggleAnnounce(r, btn, card) {
+    const on = r.announced ? 0 : 1;
+    btn.disabled = true;
+    try {
+      await fetch('/api/announce?key=' + encodeURIComponent(KEY), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: r.id, on })
+      });
+      r.announced = on;
+    } catch (e) {}
+    btn.disabled = false;
+    setAckBtn(btn, r.announced);
+    card.classList.toggle('announced', !!r.announced);
+  }
+
+  function renderShoutouts(rows) {
+    shoutEl.replaceChildren();
+    emptyEl.hidden = rows.length > 0;
+    const unread = rows.filter(r => !r.announced).length;
+    countEl.textContent = unread + ' to read · ' + rows.length + ' total';
+    if (!rows.length) {
+      emptyEl.textContent = 'No birthday or anniversary shoutouts yet. 🎂';
+      return;
+    }
+    let lastDay = '';
+    rows.forEach(r => {
+      const day = new Date(r.created_at).toLocaleDateString('en-US',
+        { timeZone: 'America/Chicago', weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' });
+      if (day !== lastDay) { shoutEl.appendChild(el('div', 'day-head', day)); lastDay = day; }
+      const card = el('div', 'req' + (r.announced ? ' announced' : ''));
+      const body = el('div', 'body');
+      body.appendChild(el('div', 'song', r.song + (r.artist ? ' — ' + r.artist : '')));
+      const ded = dedBlock(r);
+      if (ded) body.appendChild(ded);
+      body.appendChild(el('div', 'meta', fmtCT(r.created_at) + ' CT'));
+      card.appendChild(body);
+      const btns = el('div', 'btns');
+      const ack = el('button', 'ack');
+      setAckBtn(ack, r.announced);
+      ack.addEventListener('click', () => toggleAnnounce(r, ack, card));
+      btns.appendChild(ack);
+      card.appendChild(btns);
+      shoutEl.appendChild(card);
+    });
+  }
+
+  async function loadShoutouts() {
+    try {
+      const res = await fetch('/api/shoutouts?key=' + encodeURIComponent(KEY));
+      if (!res.ok) return;
+      renderShoutouts((await res.json()).shoutouts);
+    } catch (e) {}
+  }
+
   // ── Stats view ──
   const statsEl = document.getElementById('stats');
   const navStats = document.getElementById('nav-stats');
@@ -974,15 +1080,19 @@ const ADMIN_HTML = `<!DOCTYPE html>
     mode = which;
     navLive.classList.toggle('on', which === 'live');
     navHist.classList.toggle('on', which === 'hist');
+    navShout.classList.toggle('on', which === 'shout');
     navStats.classList.toggle('on', which === 'stats');
     listEl.hidden = which !== 'live';
     histEl.hidden = which !== 'hist';
+    shoutEl.hidden = which !== 'shout';
     statsEl.hidden = which !== 'stats';
     emptyEl.hidden = true;
+    emptyEl.textContent = 'No requests yet — the booth is quiet. 🎧';
   }
 
   navLive.addEventListener('click', () => { setView('live'); lastJSON = ''; loadLive(); });
   navHist.addEventListener('click', () => { setView('hist'); loadHistory(); });
+  navShout.addEventListener('click', () => { setView('shout'); loadShoutouts(); });
   navStats.addEventListener('click', () => { setView('stats'); loadStats(); });
 
   // ── Monthly report: browser-side delivery ──
