@@ -667,6 +667,12 @@ const ADMIN_HTML = `<!DOCTYPE html>
   }
   button.ack.on { background: linear-gradient(135deg, var(--success), #3f8f5c); color: #000; border-color: transparent; }
   button.ack:active { transform: scale(0.94); }
+  button.scope {
+    background: var(--card); color: rgba(255,255,255,0.7); border: 1px solid var(--border);
+    border-radius: 50px; padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer;
+  }
+  button.scope.on { border-color: var(--gold); color: var(--gold); }
   .req.announced { opacity: 0.55; }
   .req.announced .song { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.4); }
   .req {
@@ -943,6 +949,10 @@ const ADMIN_HTML = `<!DOCTYPE html>
   //    with a "✓ Read on mic" check the whole band shares ──
   const shoutEl = document.getElementById('shout');
   const navShout = document.getElementById('nav-shout');
+  // Tonight = last 12h, same window as the public celebration spotlight
+  const TONIGHT_MS = 12 * 3600000;
+  let shoutRows = [];
+  let shoutScope = 'tonight';
 
   function setAckBtn(btn, on) {
     btn.textContent = on ? '✅ Read on mic' : '🎤 Mark as read';
@@ -965,13 +975,29 @@ const ADMIN_HTML = `<!DOCTYPE html>
     card.classList.toggle('announced', !!r.announced);
   }
 
-  function renderShoutouts(rows) {
+  function renderShoutouts() {
     shoutEl.replaceChildren();
+    const rows = shoutScope === 'tonight'
+      ? shoutRows.filter(r => Date.now() - r.created_at <= TONIGHT_MS)
+      : shoutRows;
+
+    const scopeBar = el('div', null);
+    scopeBar.style.cssText = 'display:flex;gap:0.5rem';
+    [['tonight', '🌙 Tonight'], ['all', '📚 All']].forEach(([scope, label]) => {
+      const b = el('button', 'scope' + (shoutScope === scope ? ' on' : ''), label);
+      b.addEventListener('click', () => { shoutScope = scope; renderShoutouts(); });
+      scopeBar.appendChild(b);
+    });
+    shoutEl.appendChild(scopeBar);
+
     emptyEl.hidden = rows.length > 0;
     const unread = rows.filter(r => !r.announced).length;
-    countEl.textContent = unread + ' to read · ' + rows.length + ' total';
+    countEl.textContent = unread + ' to read · ' + rows.length +
+      (shoutScope === 'tonight' ? ' tonight' : ' total');
     if (!rows.length) {
-      emptyEl.textContent = 'No birthday or anniversary shoutouts yet. 🎂';
+      emptyEl.textContent = shoutScope === 'tonight'
+        ? 'No shoutouts tonight yet. 🎂  (Tap 📚 All for past ones.)'
+        : 'No birthday or anniversary shoutouts yet. 🎂';
       return;
     }
     let lastDay = '';
@@ -1000,7 +1026,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
     try {
       const res = await fetch('/api/shoutouts?key=' + encodeURIComponent(KEY));
       if (!res.ok) return;
-      renderShoutouts((await res.json()).shoutouts);
+      shoutRows = (await res.json()).shoutouts;
+      renderShoutouts();
     } catch (e) {}
   }
 
