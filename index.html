@@ -3694,6 +3694,8 @@
     // data-date + "H:MM AM - H:MM PM" time text defines a gig window.
     // The tab opens 60 min before downbeat and CLOSES 30 min before
     // the listed end — no new requests land during the final stretch.
+    // EXCEPTION: wedding cards (data-wedding attribute) skip the early
+    // close — the request line stays open until docked (listed end).
     // Admin mode or ?djtest in the URL forces it on.
     // Requests go to the band-only live queue (Cloudflare Worker + D1)
     // AND to the email inbox — neither failing blocks the other.
@@ -3708,7 +3710,10 @@
     // ±offsets and the card-derived windows are ignored for that stretch.
     const DJ_EXACT_WINDOWS = [
       // Jul 7, 2026: unlisted one-off — line runs 4:30-9:30 sharp
-      { open: new Date(2026, 6, 7, 16, 30).getTime(), close: new Date(2026, 6, 7, 21, 30).getTime() }
+      { open: new Date(2026, 6, 7, 16, 30).getTime(), close: new Date(2026, 6, 7, 21, 30).getTime() },
+      // Jul 19, 2026: Kaylin & Colten Scott wedding (SunQuest Solaris) —
+      // line open boarding through sparkler send-off, 5:30-10:00 sharp
+      { open: new Date(2026, 6, 19, 17, 30).getTime(), close: new Date(2026, 6, 19, 22, 0).getTime() }
     ];
 
     function parseGigWindows() {
@@ -3723,7 +3728,9 @@
         const start = new Date(y, mo - 1, d, to24(+m[1], m[3]), +m[2]);
         const end = new Date(y, mo - 1, d, to24(+m[4], m[6]), +m[5]);
         if (end <= start) end.setDate(end.getDate() + 1); // 9 PM - 1 AM sets
-        wins.push({ start: start.getTime(), end: end.getTime() });
+        // Wedding cards (data-wedding attr): the line stays open until docked —
+        // no 30-min early close. Standard gigs keep the early close.
+        wins.push({ start: start.getTime(), end: end.getTime(), wedding: 'wedding' in card.dataset });
       });
       return wins.concat(DJ_EXTRA_WINDOWS);
     }
@@ -3734,7 +3741,7 @@
       const exact = DJ_EXACT_WINDOWS.find(w => now >= w.open - 12 * 3600000 && now <= w.close);
       const live = exact
         ? now >= exact.open
-        : parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end - DJ_END_EARLY_MS);
+        : parseGigWindows().some(w => now >= w.start - DJ_PRE_MS && now <= w.end - (w.wedding ? 0 : DJ_END_EARLY_MS));
       const show = forced || live;
       document.body.classList.toggle('dj-live', show);
       if (!show && document.getElementById('panel-dj').classList.contains('active')) {
