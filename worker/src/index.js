@@ -651,7 +651,7 @@ const ADMIN_HTML = `<!DOCTYPE html>
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
   #count { font-size: 0.95rem; color: var(--gold); border: 1px solid var(--border);
     padding: 0.35rem 0.9rem; border-radius: 50px; }
-  nav { max-width: 720px; margin: 0 auto 1.25rem; display: flex; gap: 0.5rem; }
+  nav { max-width: 720px; margin: 0 auto 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
   nav button {
     background: var(--card); color: #fff; border: 1px solid var(--border);
     border-radius: 50px; padding: 0.5rem 1.1rem; font-size: 0.9rem; font-weight: 700;
@@ -753,7 +753,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <nav>
   <button id="nav-live" class="on">🎶 Live Queue</button>
   <button id="nav-hist">📜 History</button>
-  <button id="nav-shout">🎂 Shoutouts</button>
+  <button id="nav-bday">🎂 Birthday Shoutouts</button>
+  <button id="nav-anniv">💍 Anniversary Shoutouts</button>
   <button id="nav-stats">📊 Stats</button>
 </nav>
 <div id="list"></div>
@@ -948,11 +949,22 @@ const ADMIN_HTML = `<!DOCTYPE html>
   // ── Shoutouts view: every birthday/anniversary sent in, full text,
   //    with a "✓ Read on mic" check the whole band shares ──
   const shoutEl = document.getElementById('shout');
-  const navShout = document.getElementById('nav-shout');
+  const navBday = document.getElementById('nav-bday');
+  const navAnniv = document.getElementById('nav-anniv');
   // Tonight = last 12h, same window as the public celebration spotlight
   const TONIGHT_MS = 12 * 3600000;
   let shoutRows = [];
   let shoutScope = 'tonight';
+  let shoutKind = 'Birthday';
+
+  // Chip-less comment mentions land on whichever tab their words match
+  // (a comment naming both shows on both tabs).
+  function matchesKind(r, kind) {
+    if (r.occasion === kind) return true;
+    if (r.occasion === (kind === 'Birthday' ? 'Anniversary' : 'Birthday')) return false;
+    const c = (r.comments || '').toLowerCase();
+    return kind === 'Birthday' ? /birthday|b-day|bday/.test(c) : c.includes('anniversary');
+  }
 
   function setAckBtn(btn, on) {
     btn.textContent = on ? '✅ Read on mic' : '🎤 Mark as read';
@@ -977,9 +989,10 @@ const ADMIN_HTML = `<!DOCTYPE html>
 
   function renderShoutouts() {
     shoutEl.replaceChildren();
-    const rows = shoutScope === 'tonight'
-      ? shoutRows.filter(r => Date.now() - r.created_at <= TONIGHT_MS)
-      : shoutRows;
+    let rows = shoutRows.filter(r => matchesKind(r, shoutKind));
+    if (shoutScope === 'tonight') {
+      rows = rows.filter(r => Date.now() - r.created_at <= TONIGHT_MS);
+    }
 
     const scopeBar = el('div', null);
     scopeBar.style.cssText = 'display:flex;gap:0.5rem';
@@ -995,9 +1008,10 @@ const ADMIN_HTML = `<!DOCTYPE html>
     countEl.textContent = unread + ' to read · ' + rows.length +
       (shoutScope === 'tonight' ? ' tonight' : ' total');
     if (!rows.length) {
+      const noun = shoutKind === 'Birthday' ? 'birthday 🎂' : 'anniversary 💍';
       emptyEl.textContent = shoutScope === 'tonight'
-        ? 'No shoutouts tonight yet. 🎂  (Tap 📚 All for past ones.)'
-        : 'No birthday or anniversary shoutouts yet. 🎂';
+        ? 'No ' + noun + ' shoutouts tonight yet.  (Tap 📚 All for past ones.)'
+        : 'No ' + noun + ' shoutouts yet.';
       return;
     }
     let lastDay = '';
@@ -1105,13 +1119,15 @@ const ADMIN_HTML = `<!DOCTYPE html>
 
   function setView(which) {
     mode = which;
+    const isShout = which === 'bday' || which === 'anniv';
     navLive.classList.toggle('on', which === 'live');
     navHist.classList.toggle('on', which === 'hist');
-    navShout.classList.toggle('on', which === 'shout');
+    navBday.classList.toggle('on', which === 'bday');
+    navAnniv.classList.toggle('on', which === 'anniv');
     navStats.classList.toggle('on', which === 'stats');
     listEl.hidden = which !== 'live';
     histEl.hidden = which !== 'hist';
-    shoutEl.hidden = which !== 'shout';
+    shoutEl.hidden = !isShout;
     statsEl.hidden = which !== 'stats';
     emptyEl.hidden = true;
     emptyEl.textContent = 'No requests yet — the booth is quiet. 🎧';
@@ -1119,7 +1135,8 @@ const ADMIN_HTML = `<!DOCTYPE html>
 
   navLive.addEventListener('click', () => { setView('live'); lastJSON = ''; loadLive(); });
   navHist.addEventListener('click', () => { setView('hist'); loadHistory(); });
-  navShout.addEventListener('click', () => { setView('shout'); loadShoutouts(); });
+  navBday.addEventListener('click', () => { setView('bday'); shoutKind = 'Birthday'; loadShoutouts(); });
+  navAnniv.addEventListener('click', () => { setView('anniv'); shoutKind = 'Anniversary'; loadShoutouts(); });
   navStats.addEventListener('click', () => { setView('stats'); loadStats(); });
 
   // ── Monthly report: browser-side delivery ──
