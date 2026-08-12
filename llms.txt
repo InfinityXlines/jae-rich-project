@@ -1,0 +1,12 @@
+# The Jae Rich Project
+
+The Jae Rich Project is a live music duo serving Florida's Emerald Coast with soulful vocals, guitar, and covers spanning rock, soul, pop, funk, Motown, and Top 40.
+
+## Links
+
+- [Canonical site](https://jaerichent.com/)
+- [Upcoming performance dates](https://jaerichent.com/#dates)
+- [Booking and contact](https://jaerichent.com/#contact)
+- Virtual tip jar: linked from the canonical site
+
+The DJ Requests interface appears only during configured performance windows. The public repertoire catalog is intentionally unavailable.

@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>THE JAE RICH PROJECT — Live DJ Requests</title>
   <meta name="description" content="The Jae Rich Project — A duo of soulful vocals, smooth guitar work and feel-good energy covering rock, soul, pop, funk, motown, top 40 and beyond.">
   <meta name="theme-color" content="#0a0a0f">
+  <link rel="canonical" href="https://jaerichent.com/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
   <style>
     /* ═══════════════════════════════════════════════════
        THE JAE RICH PROJECT — Neo-Soul Pop Rock Vibe
@@ -1743,11 +1744,11 @@
       <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
       Home
     </a>
-    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('dates')">
+    <a href="#dates" class="nav-link" onclick="switchTab('dates')">
       <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Dates
     </a>
-    <a href="javascript:void(0)" class="nav-link" onclick="switchTab('contact')">
+    <a href="#contact" class="nav-link" onclick="switchTab('contact')">
       <svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
       Contact
     </a>
@@ -1801,8 +1802,8 @@
 
     <!-- ─── DATES PANEL ─── -->
     <div class="tab-panel active" id="panel-dates">
-      <div class="schedule-month">
-        <h3>Upcoming Dates</h3>
+      <div class="schedule-month" id="dates" tabindex="-1">
+        <h2>Upcoming Dates</h2>
         <p>Catch us live at Sunquest Solaris, Miramar Beach!</p>
       </div>
       <div class="schedule-grid" id="schedule-grid">
@@ -2884,7 +2885,15 @@
             <div class="gig-time">6:30 PM - 9:30 PM</div>
           </div>
         </div>
-        <div class="gig-card" data-date="2026-08-09">
+        <div class="gig-card" data-date="2026-08-09" data-order="1">
+          <div class="gig-date"><div class="month">Aug</div><div class="day">9</div></div>
+          <div class="gig-info">
+            <div class="gig-venue">The Alice</div>
+            <div class="gig-details">P.A.W.S. Fundraiser • Destin</div>
+            <div class="gig-time">11:00 AM - 2:00 PM</div>
+          </div>
+        </div>
+        <div class="gig-card" data-date="2026-08-09" data-order="2">
           <div class="gig-date"><div class="month">Aug</div><div class="day">9</div></div>
           <div class="gig-info">
             <div class="gig-venue">Sunquest Solaris</div>
@@ -3072,16 +3081,16 @@
     </div>
 
     <div class="tab-panel" id="panel-contact">
-      <div style="text-align:center; padding:1rem 0;">
+      <div id="contact" tabindex="-1" style="text-align:center; padding:1rem 0;">
         <div style="margin-bottom:1.5rem;">
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" style="margin-bottom:1rem;"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           <h3 style="font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--cream); margin-bottom:0.5rem;">Book Us</h3>
           <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.6; max-width:400px; margin:0 auto 1.5rem;">Interested in booking The Jae Rich Project for your event? We'd love to hear from you!</p>
         </div>
-        <a href="mailto:jaerich007@gmail.com" style="display:inline-flex; align-items:center; gap:0.6rem; padding:1.1rem 2.5rem; background:linear-gradient(135deg, var(--gold), var(--amber)); color:#000000;font-weight:900; font-family:'DM Sans',sans-serif; font-size:1.15rem; font-weight:700; border-radius:50px; text-decoration:none; text-transform:uppercase; letter-spacing:0.05em; transition:all 0.3s ease;">
+        <!--email_off--><a href="mailto:jaerich007@gmail.com" style="display:inline-flex; align-items:center; gap:0.6rem; padding:1.1rem 2.5rem; background:linear-gradient(135deg, var(--gold), var(--amber)); color:#000000;font-weight:900; font-family:'DM Sans',sans-serif; font-size:1.15rem; font-weight:700; border-radius:50px; text-decoration:none; text-transform:uppercase; letter-spacing:0.05em; transition:all 0.3s ease;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           Email Us
-        </a>
+        </a><!--/email_off-->
       </div>
     </div>
   </div>

@@ -26,8 +26,11 @@ Just open `index.html` in a browser. That's it — everything is in one file.
 
 ## Deploy
 
-Enable GitHub Pages (Settings → Pages → Source: main branch) and the site goes live at:
-`https://infinityxlines.github.io/jae-rich-project/`
+Production is deployed to Cloudflare Pages at `https://jaerichent.com/`.
+
+The deploy package must include `index.html`, `_headers`, `_redirects`,
+`favicon.svg`, `robots.txt`, `sitemap.xml`, and `llms.txt`. Verify the live custom
+domain after every deployment; a successful dashboard upload alone is not proof.
 
 ## Admin Controls
 
