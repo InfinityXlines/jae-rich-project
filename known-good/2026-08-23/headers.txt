@@ -1,0 +1,23 @@
+HTTP/2 103 
+link: <https://fonts.googleapis.com>; rel=preconnect
+
+HTTP/2 200 
+date: Sun, 23 Aug 2026 18:02:30 GMT
+content-type: text/html; charset=utf-8
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=3bkyoSe4nxt42xqnl%2BzanHOsOcEdiNNmXVAsmE0iF8h%2BGH1E4bGWzuCmBk7NBCEm%2FvkT1qRHKsV2LEc0mvULljL3aJ4MuSVuBHLY7%2BWxOJtDpi57fGQcP0xNQZA1u%2FcC6g%3D%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+access-control-allow-origin: *
+cache-control: public, max-age=0, must-revalidate
+link: <https://fonts.googleapis.com>; rel="preconnect"
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formsubmit.co https://jrp-live-queue.jrichproject.workers.dev; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+permissions-policy: camera=(), microphone=(), geolocation=(), payment=()
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-xss-protection: 1; mode=block
+server: cloudflare
+cf-cache-status: DYNAMIC
+cf-ray: a2fc07537cafac0d-PDX
+alt-svc: h3=":443"; ma=86400
+
